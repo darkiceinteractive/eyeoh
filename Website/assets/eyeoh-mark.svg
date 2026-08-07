@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 164 164" role="img" aria-labelledby="title desc">
+  <title id="title">EyeOh by Dark Ice</title>
+  <desc id="desc">The canonical three-face Dark Ice cube mark</desc>
+  <rect x="4" y="4" width="156" height="156" rx="36" fill="#0a1218"/>
+  <!-- Canonical geometry and colours from https://darkice.au/assets/img/brand/darkice-logo.svg -->
+  <g transform="translate(14 14) scale(.85)">
+    <path d="M 71.35 15.03 Q 80.00 10.02 88.65 15.03 L 136.87 42.98 Q 145.52 48.00 136.87 53.02 L 88.65 80.97 Q 80.00 85.98 71.35 80.97 L 23.13 53.02 Q 14.48 48.00 23.13 42.98 Z" fill="#008BB4"/>
+    <path d="M 12.56 70.42 Q 12.56 60.42 21.21 65.44 L 62.79 89.58 Q 71.44 94.60 71.44 104.60 L 71.44 141.58 Q 71.44 151.58 62.79 146.56 L 21.21 122.42 Q 12.56 117.40 12.56 107.40 Z" fill="#a0ce4e"/>
+    <path d="M 88.56 104.60 Q 88.56 94.60 97.21 89.58 L 138.79 65.44 Q 147.44 60.42 147.44 70.42 L 147.44 107.40 Q 147.44 117.40 138.79 122.42 L 97.21 146.56 Q 88.56 151.58 88.56 141.58 Z" fill="#323643"/>
+  </g>
+</svg>

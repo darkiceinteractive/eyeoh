@@ -1,0 +1,30 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Show toolchain
+        run: swift --version
+      - name: Build and test
+        run: swift test
+      - name: Check release metadata
+        run: ./Scripts/check_release_metadata.sh
+      - name: Package universal ad-hoc build
+        run: |
+          ./Scripts/build_icon.sh
+          ARCHES="arm64 x86_64" ./Scripts/package_app.sh release
+          lipo build/EyeOh.app/Contents/MacOS/EyeOh -verify_arch arm64 x86_64
+          codesign --verify --deep --strict build/EyeOh.app
+      - name: Install ShellCheck
+        run: brew install shellcheck
+      - name: Lint shell scripts
+        run: shellcheck Scripts/*.sh run-menubar.sh stop-menubar.sh

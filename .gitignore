@@ -1,0 +1,10 @@
+.DS_Store
+.darkice/
+Design/
+.build/
+build/
+dist/
+Website/downloads/
+Icon.icns
+*.xcodeproj/
+xcuserdata/
