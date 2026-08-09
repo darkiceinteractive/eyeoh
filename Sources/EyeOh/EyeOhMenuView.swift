@@ -41,8 +41,9 @@ struct EyeOhMenuView: View {
                         cameraButton(for: camera)
                     }
 
-                    Button("Preview Preferred Camera…", systemImage: "eye") {
+                    Button("Preview Preferred Camera…", systemImage: "video") {
                         openWindow(id: "camera-preview")
+                        CameraPreviewWindowPresenter.bringToFront()
                     }
                     .disabled(cameraStore.selectedCamera == nil)
                 }
@@ -247,5 +248,39 @@ struct EyeOhMenuView: View {
             string: "x-apple.systempreferences:com.apple.Sound-Settings.extension"
         ) else { return }
         NSWorkspace.shared.open(url)
+    }
+}
+
+@MainActor
+private enum CameraPreviewWindowPresenter {
+    private static let windowTitle = "Camera Preview"
+
+    static func bringToFront(attemptsRemaining: Int = 6) {
+        if let window = NSApplication.shared.windows.first(where: { $0.title == windowTitle }) {
+            var collectionBehavior = window.collectionBehavior
+            collectionBehavior.insert(.moveToActiveSpace)
+            window.collectionBehavior = collectionBehavior
+
+            if !NSScreen.screens.contains(where: { $0.visibleFrame.intersects(window.frame) }),
+               let screen = NSScreen.main ?? NSScreen.screens.first {
+                var frame = window.frame
+                frame.origin = NSPoint(
+                    x: screen.visibleFrame.midX - frame.width / 2,
+                    y: screen.visibleFrame.midY - frame.height / 2
+                )
+                window.setFrame(frame, display: false)
+            }
+
+            NSRunningApplication.current.activate(options: [.activateAllWindows])
+            window.makeKeyAndOrderFront(nil)
+            window.orderFrontRegardless()
+            return
+        }
+
+        guard attemptsRemaining > 0 else { return }
+        Task { @MainActor in
+            try? await Task.sleep(for: .milliseconds(100))
+            bringToFront(attemptsRemaining: attemptsRemaining - 1)
+        }
     }
 }
