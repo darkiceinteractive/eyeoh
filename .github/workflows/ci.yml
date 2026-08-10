@@ -1,14 +1,13 @@
 name: CI
 
 on:
-  push:
-  pull_request:
+  workflow_dispatch:
 
 permissions:
   contents: read
 
 jobs:
-  test:
+  source-validation:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4

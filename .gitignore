@@ -13,3 +13,9 @@ Website/artifacts/
 Icon.icns
 *.xcodeproj/
 xcuserdata/
+.env
+.env.*
+!.env.example
+*.p12
+*.mobileprovision
+*.provisionprofile

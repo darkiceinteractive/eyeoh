@@ -8,7 +8,7 @@ Consent schema version 1 deliberately clears any saved values from the earlier p
 
 The instrumentation boundary, consent controls, EU-only configuration, event vocabulary, ownership and privacy notice are implemented and tested locally. Production project receipt, PostHog IP-discard configuration, Sentry IP scrubbing, symbol upload/symbolication and retention evidence are still required before the public build can truthfully ship with either provider configured.
 
-Dark Ice Interactive owns the data and release configuration. Provider administration must use a named Dark Ice account with multi-factor authentication. Project tokens and DSNs are public ingestion identifiers rather than administrator credentials, but they are still injected only into official builds to limit event pollution. PostHog personal API keys and Sentry auth tokens must never enter the app or repository.
+Dark Ice Interactive owns the data and release configuration. Provider administration must use a named Dark Ice account with multi-factor authentication. Project tokens and DSNs are public ingestion identifiers rather than administrator credentials, but they are still injected only into official builds to limit casual event pollution. They cannot be made secret after distribution. PostHog personal API keys, project-secret API keys and Sentry auth tokens must never enter the app or repository. See `RELEASING.md`.
 
 ## Decision → event map
 
@@ -31,7 +31,9 @@ There is no app-level purchase or signup conversion. The later website funnel sh
 
 ## PostHog configuration
 
-EyeOh posts the fixed events directly to PostHog’s batch ingestion endpoint with an ephemeral `URLSession`. It does not bundle the PostHog mobile SDK. Consequently there is no autocapture, session replay, screen capture, feature-flag loading, surveys, lifecycle capture, person-profile creation, cookie store, or offline event queue.
+The current client can post the fixed events directly to PostHog’s batch ingestion endpoint with an ephemeral `URLSession`. It does not bundle the PostHog mobile SDK. Consequently there is no autocapture, session replay, screen capture, feature-flag loading, surveys, lifecycle capture, person-profile creation, cookie store, or offline event queue.
+
+PostHog documents event capture as a public POST-only endpoint without request-level rate limiting. The production release must therefore route statistics through `telemetry.eyeoh.app`: a minimal Cloudflare Worker that holds the project token as a Worker secret, rebuilds only the allowlisted schema, rejects unknown events/properties and oversized requests, and rate-limits abuse. Until that gateway is deployed and validated, production builds must leave `POSTHOG_PROJECT_TOKEN` unset.
 
 Official builds accept only `https://eu.i.posthog.com`. Before release, the project owner must:
 
@@ -66,6 +68,7 @@ If no provider values are present, the packaged app reports that no service is c
 ## Release evidence still required
 
 - [ ] PostHog EU project created; IP discard and access controls captured.
+- [ ] `telemetry.eyeoh.app` gateway deployed with schema validation, payload limit, rate limiting and a Worker-held PostHog project token.
 - [ ] Sentry EU project created; IP scrubbing, data scrubbing and AI-off state captured.
 - [ ] Release environment values loaded from the Dark Ice secret store without appearing in logs.
 - [ ] Each allowed PostHog event received with only the allowlisted properties.

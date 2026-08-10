@@ -120,14 +120,16 @@ Primary sources:
 - [x] Astro/Cloudflare Pages product website with an honest branded interface illustration while the final release screenshot is pending.
 - [x] MIT software license, separate Dark Ice trademark policy, and accurate privacy language.
 - [x] Documented the MIT Core/commercial Pro boundary, current IP provenance, and CLA-gated external contribution process.
-- [x] Branded Help and About views, feedback mail action, and an implemented opt-in diagnostics boundary.
+- [x] Branded Help and About views, feedback mail action, and an implemented consent-gated diagnostics boundary.
 - [x] EU-only PostHog and Sentry release configuration with source builds offline by default.
 - [x] Native Settings window with Service Management launch-at-login, separate off-by-default reporting choices, and consolidated Help/About/system actions.
 - [x] Universal-build, Developer ID, Hardened Runtime, ZIP, and notarization scripts.
+- [x] Public-source/private-release boundary documented; upstream GitHub Actions limited to a manual, read-only, secret-free source validation run.
 - [x] Rerun the App Sandbox probe for `au.com.darkice.eyeoh`, including the explicitly opt-in state-restoring write check.
 - [x] Build and inspect a universal EyeOh Developer ID-signed release candidate: `arm64` + `x86_64`, Hardened Runtime, secure timestamp, signature and ZIP verified. Gatekeeper correctly reports it as unnotarized until the remaining submission step.
 - [x] Freeze the public name as EyeOh, bundle ID as `au.com.darkice.eyeoh`, and executable as `EyeOh`.
 - [ ] Confirm the final EyeOh app icon, public domain, and repository name.
+- [ ] Deploy and validate the rate-limited `telemetry.eyeoh.app` PostHog gateway before enabling usage statistics in production.
 - [ ] Add the final repository, support, and privacy URLs to release metadata and the website.
 - [ ] Complete the provider-side and receipt checks in `TELEMETRY.md`; current source build has no provider credentials.
 - [ ] Configure or identify a `notarytool` Keychain profile.
