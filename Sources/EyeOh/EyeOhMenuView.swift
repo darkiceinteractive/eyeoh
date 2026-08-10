@@ -3,6 +3,7 @@ import SwiftUI
 
 struct EyeOhMenuView: View {
     @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.openSettings) private var openSettings
     @Environment(\.openWindow) private var openWindow
 
     let store: AudioDeviceStore
@@ -69,34 +70,11 @@ struct EyeOhMenuView: View {
 
             Divider()
 
-            Button("Refresh", systemImage: "arrow.clockwise") {
-                store.refresh()
-                cameraStore.refresh()
+            Button("Settings…", systemImage: "gearshape") {
+                openSettings()
+                AppWindowPresenter.bringSettingsToFront()
             }
-            .keyboardShortcut("r")
-
-            Button("Open Sound Settings…", systemImage: "gear") {
-                openSoundSettings()
-            }
-
-            Divider()
-
-            Button("EyeOh Help", systemImage: "questionmark.circle") {
-                openWindow(id: "help")
-                AppWindowPresenter.bringToFront(title: "EyeOh Help")
-            }
-
-            Button("Send Feedback…", systemImage: "envelope") {
-                FeedbackMail.open()
-                Diagnostics.record(.feedbackOpened)
-            }
-
-            Divider()
-
-            Button("About EyeOh", systemImage: "info.circle") {
-                openWindow(id: "about")
-                AppWindowPresenter.bringToFront(title: "About EyeOh")
-            }
+            .keyboardShortcut(",")
 
             Button("Quit EyeOh", systemImage: "power") {
                 NSApplication.shared.terminate(nil)
@@ -263,10 +241,4 @@ struct EyeOhMenuView: View {
         name.replacingOccurrences(of: "MacBook Pro", with: "MacBook", options: .caseInsensitive)
     }
 
-    private func openSoundSettings() {
-        guard let url = URL(
-            string: "x-apple.systempreferences:com.apple.Sound-Settings.extension"
-        ) else { return }
-        NSWorkspace.shared.open(url)
-    }
 }

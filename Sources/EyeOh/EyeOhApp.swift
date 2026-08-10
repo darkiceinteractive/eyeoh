@@ -5,6 +5,8 @@ import SwiftUI
 struct EyeOhApp: App {
     @State private var store: AudioDeviceStore
     @State private var cameraStore: CameraDeviceStore
+    @State private var preferences: AppPreferences
+    @State private var launchAtLogin: LaunchAtLoginController
 
     init() {
         Diagnostics.record(.appLaunched)
@@ -12,6 +14,8 @@ struct EyeOhApp: App {
         store.startMonitoring()
         _store = State(initialValue: store)
         _cameraStore = State(initialValue: CameraDeviceStore(controller: AVCameraClient()))
+        _preferences = State(initialValue: AppPreferences())
+        _launchAtLogin = State(initialValue: LaunchAtLoginController())
     }
 
     var body: some Scene {
@@ -35,16 +39,14 @@ struct EyeOhApp: App {
         .defaultSize(width: 680, height: 500)
         .windowResizability(.contentMinSize)
 
-        Window("EyeOh Help", id: "help") {
-            EyeOhHelpView()
+        Settings {
+            EyeOhSettingsView(
+                store: store,
+                cameraStore: cameraStore,
+                preferences: preferences,
+                launchAtLogin: launchAtLogin
+            )
         }
-        .defaultSize(width: 540, height: 580)
-        .windowResizability(.contentSize)
-
-        Window("About EyeOh", id: "about") {
-            EyeOhAboutView()
-        }
-        .defaultSize(width: 440, height: 470)
-        .windowResizability(.contentSize)
+        .defaultSize(width: 620, height: 540)
     }
 }

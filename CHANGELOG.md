@@ -4,11 +4,12 @@ All notable changes will be recorded here. The project follows semantic versioni
 
 ## Unreleased
 
+- Added a native Settings window with launch-at-login, opt-in reporting consent, device maintenance, Help and About tabs; reduced the menu to frequently used controls.
 - Formalised the MIT Core and future proprietary Pro boundary, IP provenance record, contributor licence agreement and pull-request acceptance workflow.
 - Shortened the menu-bar device indicator and removed redundant transport labels from menu rows.
-- Added branded Help and About windows plus pre-addressed feedback email.
+- Added branded Help and About views plus pre-addressed feedback email.
 - Added a privacy-safe local diagnostics vocabulary and documented the gate for future opt-in network telemetry.
-- Raised camera, Help and About windows onto the active desktop when opened from the menu bar.
+- Raised camera preview and Settings onto the active desktop when opened from the menu bar.
 
 ## 0.3.0 — EyeOh release candidate
 

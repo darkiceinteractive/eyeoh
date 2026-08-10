@@ -1,8 +1,7 @@
 import OSLog
 
-/// Privacy-safe instrumentation boundary. The current free build records only
-/// local, non-identifying operational events in Unified Logging. No device
-/// names, identifiers, audio, video or network requests are included.
+/// Privacy-safe instrumentation boundary. Events are recorded locally only
+/// after the user opts in. The current build has no network reporting provider.
 enum Diagnostics {
     enum Event: String {
         case appLaunched = "app_launched"
@@ -18,7 +17,13 @@ enum Diagnostics {
         category: "product-events"
     )
 
+    static let hasStatisticsProvider = false
+    static let hasCrashReportingProvider = false
+
     static func record(_ event: Event) {
+        guard UserDefaults.standard.bool(forKey: AppPreferenceKeys.anonymousStatistics) else {
+            return
+        }
         logger.info("Event: \(event.rawValue, privacy: .public)")
     }
 }

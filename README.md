@@ -15,7 +15,7 @@ EyeOh is a free Dark Ice utility. Its app mark and colour system use the canonic
 - Refreshes audio devices automatically when they connect, disconnect, or change elsewhere; cameras refresh whenever the menu opens or you choose Refresh.
 - Opens Sound Settings for input volume and other advanced controls.
 - Runs menu-bar only, with no Dock icon.
-- Includes local Help, About and a pre-addressed feedback email with only the app and macOS versions filled in.
+- Includes a native Settings window with launch-at-login, privacy choices, Help, About and a pre-addressed feedback email with only the app and macOS versions filled in.
 
 EyeOh changes the macOS **system default input**. An app such as Teams or Zoom can be configured to use a specific device instead of the system default; in that case, change the app's own microphone setting back to “Default” for it to follow EyeOh.
 
@@ -53,7 +53,7 @@ The public website lives in `Website/`. Its download is populated only after an 
 
 ## Privacy and diagnostics
 
-The current build does not contain a third-party analytics or crash-reporting SDK and makes no telemetry network requests. A small, privacy-safe event vocabulary is written to macOS Unified Logging so release behaviour can be diagnosed locally without recording device names, identifiers, audio or video. See `TELEMETRY.md` for the readiness gate that must be completed before any optional network diagnostics can be introduced.
+Anonymous statistics and crash reporting are both off by default. The current build does not contain a third-party analytics or crash-reporting SDK and makes no telemetry network requests. If anonymous statistics are enabled, a small privacy-safe event vocabulary is written only to macOS Unified Logging without device names, identifiers, audio or video. See `TELEMETRY.md` for the readiness gate that must be completed before any optional network diagnostics can be introduced.
 
 For direct-download crashes, users can send feedback and attach the crash report macOS creates. App Store builds can additionally use Apple's opt-in crash and usage reports. The in-app feedback action never attaches a recording or device list.
 

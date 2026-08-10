@@ -43,7 +43,6 @@ struct EyeOhHelpView: View {
             }
             .padding(28)
         }
-        .frame(width: 540, height: 580)
         .background(DarkIceBrand.charcoal.opacity(0.035))
     }
 
@@ -64,8 +63,6 @@ struct EyeOhHelpView: View {
 }
 
 struct EyeOhAboutView: View {
-    @Environment(\.openWindow) private var openWindow
-
     var body: some View {
         VStack(spacing: 18) {
             Image(nsImage: IORouteStatusIcon.image)
@@ -97,9 +94,9 @@ struct EyeOhAboutView: View {
             }
 
             HStack(spacing: 12) {
-                Button("Help") {
-                    openWindow(id: "help")
-                    AppWindowPresenter.bringToFront(title: "EyeOh Help")
+                Button("Visit Dark Ice") {
+                    guard let url = URL(string: "https://darkice.au/") else { return }
+                    NSWorkspace.shared.open(url)
                 }
                 Button("Send Feedback…") {
                     FeedbackMail.open()
@@ -112,7 +109,7 @@ struct EyeOhAboutView: View {
                 .foregroundStyle(.secondary)
         }
         .padding(28)
-        .frame(width: 440, height: 470)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 }
 

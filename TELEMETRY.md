@@ -1,6 +1,6 @@
 # EyeOh telemetry readiness
 
-EyeOh 0.3.0 ships without network analytics or a third-party crash-reporting SDK. It records a deliberately small event vocabulary in macOS Unified Logging only:
+EyeOh 0.3.0 ships without network analytics or a third-party crash-reporting SDK. Settings provides separate, off-by-default consent choices for anonymous statistics and crash reporting. When anonymous statistics are enabled, EyeOh records a deliberately small event vocabulary in macOS Unified Logging only:
 
 - `input_changed`
 - `app_launched`
@@ -27,4 +27,4 @@ Before enabling any external analytics or automatic crash submission:
 6. Validate development, release and crash flows without using real customer data.
 7. Verify provider receipt and symbolication, then record release evidence.
 
-Until this gate is complete, feedback email and local Apple crash reports are the supported diagnostic path for the direct-download build.
+The settings screen explicitly reports when no provider is connected so saved consent is never mistaken for active transmission. Until this gate is complete, feedback email and local Apple crash reports are the supported diagnostic path for the direct-download build.
