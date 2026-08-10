@@ -2,6 +2,18 @@
 
 Thanks for helping improve this small macOS utility.
 
+## Contributor agreement
+
+Bug reports, feature discussions and testing feedback are welcome without a contributor agreement. Code, documentation, design or other material intended for inclusion in the repository can be merged only after the contributor accepts `CONTRIBUTOR_LICENSE_AGREEMENT.md`.
+
+For a pull request to be eligible for review, the contributor must:
+
+1. Read the current contributor licence agreement.
+2. Add their own entry to `CLA-SIGNATURES.md` in the pull request.
+3. Affirm the agreement in the pull-request checklist.
+
+The contributor keeps ownership of their work. The agreement gives Dark Ice a broad, non-exclusive licence so contributions can remain in the MIT project and also be used in supported or commercial EyeOh editions. A maintainer must verify that the pull-request author matches the signature entry before merging.
+
 ## Development
 
 1. Use macOS 14 or later with Swift 6.2 or newer.

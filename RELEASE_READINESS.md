@@ -118,6 +118,7 @@ Primary sources:
 - [x] Menu-bar-only bundle and native accessible menu.
 - [x] Static product website with an honest branded hero while the final EyeOh menu screenshot is pending.
 - [x] MIT software license, separate Dark Ice trademark policy, and accurate privacy language.
+- [x] Documented the MIT Core/commercial Pro boundary, current IP provenance, and CLA-gated external contribution process.
 - [x] Branded Help and About windows, feedback mail action, and a documented privacy gate for future network diagnostics.
 - [x] Universal-build, Developer ID, Hardened Runtime, ZIP, and notarization scripts.
 - [x] Rerun the App Sandbox probe for `au.com.darkice.eyeoh`, including the explicitly opt-in state-restoring write check.

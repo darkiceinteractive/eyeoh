@@ -59,7 +59,13 @@ For direct-download crashes, users can send feedback and attach the crash report
 
 ## Contributing
 
-See `CONTRIBUTING.md` for the development workflow and `SECURITY.md` for responsible vulnerability reporting. The code is MIT-licensed. Official Dark Ice names and artwork are covered separately by `TRADEMARKS.md`.
+See `CONTRIBUTING.md` for the development workflow and `SECURITY.md` for responsible vulnerability reporting. External code contributions require acceptance of `CONTRIBUTOR_LICENSE_AGREEMENT.md` before they can be merged.
+
+## Licensing and editions
+
+EyeOh Core—the functionality in this repository—is free and open-source software under the MIT License. Official Dark Ice names and artwork are covered separately by `TRADEMARKS.md`.
+
+Dark Ice may also distribute official signed builds, support services, or future commercial editions containing additional proprietary modules. The MIT core remains MIT-licensed; a commercial edition does not withdraw rights already granted to the public. See `COMMERCIAL_MODEL.md` for the intended boundary.
 
 ## Scope guardrails
 
