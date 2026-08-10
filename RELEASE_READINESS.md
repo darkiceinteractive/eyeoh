@@ -1,6 +1,6 @@
 # EyeOh release readiness
 
-Checked: 7 August 2026 (Australia/Brisbane)
+Checked: 10 August 2026 (Australia/Brisbane)
 
 ## Recommendation
 
@@ -15,7 +15,7 @@ EyeOh's core behaviour is not prohibited by the current guidelines:
 - It uses Apple's documented Core Audio device and default-input/default-output selectors.
 - Camera discovery, preference, and preview use public AVFoundation APIs. Preview is user-initiated and frames are not recorded, stored, or transmitted.
 - It is a self-contained menu-bar utility and does not install a driver, helper, kernel extension, or privileged component.
-- It does not capture microphone audio, request microphone access, create an account, collect data, or make network requests. Camera access is requested only for an explicitly opened local preview.
+- It does not capture microphone audio, request microphone access, create an account, or make telemetry network requests. Camera access is requested only for an explicitly opened local preview. Non-identifying product events are written only to local macOS Unified Logging.
 - Per-device volume presets are stored locally in app preferences and never uploaded.
 - Its audio switching is substantial native utility rather than a repackaged website.
 
@@ -77,6 +77,7 @@ This is the shortest release path. Apple requires a public direct-distribution b
 
 Current local state (machine-specific signing details intentionally omitted):
 
+- EyeOh `0.3.0 (4)` is built as a universal `arm64` + `x86_64` app, signed with the Dark Ice Developer ID certificate, and archived at `dist/EyeOh-0.3.0.zip`. Signature verification passes; it remains intentionally unnotarized until submission is authorized.
 - `Scripts/release_direct.sh` builds a universal Apple Silicon/Intel app, signs it with the `APP_IDENTITY` supplied by the maintainer, verifies it, and creates a ZIP.
 - Passing `--notarize` submits through `notarytool`, staples and validates the ticket, verifies Gatekeeper acceptance, then creates `Website/downloads/EyeOh.zip`.
 - Notary credentials have not been assumed or tested. Set `NOTARY_PROFILE` to an existing `notarytool` Keychain profile only when publication is authorized.
@@ -117,6 +118,7 @@ Primary sources:
 - [x] Menu-bar-only bundle and native accessible menu.
 - [x] Static product website with an honest branded hero while the final EyeOh menu screenshot is pending.
 - [x] MIT software license, separate Dark Ice trademark policy, and accurate privacy language.
+- [x] Branded Help and About windows, feedback mail action, and a documented privacy gate for future network diagnostics.
 - [x] Universal-build, Developer ID, Hardened Runtime, ZIP, and notarization scripts.
 - [x] Rerun the App Sandbox probe for `au.com.darkice.eyeoh`, including the explicitly opt-in state-restoring write check.
 - [x] Build and inspect a universal EyeOh Developer ID-signed release candidate: `arm64` + `x86_64`, Hardened Runtime, secure timestamp, signature and ZIP verified. Gatekeeper correctly reports it as unnotarized until the remaining submission step.

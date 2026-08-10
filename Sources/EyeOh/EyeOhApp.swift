@@ -7,6 +7,7 @@ struct EyeOhApp: App {
     @State private var cameraStore: CameraDeviceStore
 
     init() {
+        Diagnostics.record(.appLaunched)
         let store = AudioDeviceStore(controller: CoreAudioClient())
         store.startMonitoring()
         _store = State(initialValue: store)
@@ -17,7 +18,7 @@ struct EyeOhApp: App {
         MenuBarExtra {
             EyeOhMenuView(store: store, cameraStore: cameraStore)
         } label: {
-            HStack(spacing: 4) {
+            HStack(spacing: 3) {
                 Image(nsImage: IORouteStatusIcon.image)
                     .opacity(store.selectedDevice == nil ? 0.48 : 1)
                 Text(store.menuBarTitle)
@@ -33,5 +34,17 @@ struct EyeOhApp: App {
         }
         .defaultSize(width: 680, height: 500)
         .windowResizability(.contentMinSize)
+
+        Window("EyeOh Help", id: "help") {
+            EyeOhHelpView()
+        }
+        .defaultSize(width: 540, height: 580)
+        .windowResizability(.contentSize)
+
+        Window("About EyeOh", id: "about") {
+            EyeOhAboutView()
+        }
+        .defaultSize(width: 440, height: 470)
+        .windowResizability(.contentSize)
     }
 }

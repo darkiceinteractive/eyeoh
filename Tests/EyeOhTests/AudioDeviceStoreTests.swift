@@ -42,6 +42,19 @@ final class AudioDeviceStoreTests: XCTestCase {
         XCTAssertNil(store.errorMessage)
     }
 
+    func testMenuBarTitleUsesACompactRecognisableDeviceName() {
+        XCTAssertEqual(
+            AudioDeviceStore.compactDeviceName("MacBook Pro Microphone"),
+            "MacBook"
+        )
+        XCTAssertEqual(AudioDeviceStore.compactDeviceName("Onyx Star"), "Onyx Star")
+        XCTAssertEqual(AudioDeviceStore.compactDeviceName("AIRHUG 11"), "AIRHUG 11")
+        XCTAssertEqual(
+            AudioDeviceStore.compactDeviceName("A Very Long USB Microphone"),
+            "A Very Lon…"
+        )
+    }
+
     func testSelectChangesDefaultInput() {
         let controller = MockAudioController()
         let builtIn = AudioDevice(

@@ -33,7 +33,7 @@ final class AudioDeviceStore {
     }
 
     var menuBarTitle: String {
-        shortened(selectedDevice?.name ?? "No input")
+        Self.compactDeviceName(selectedDevice?.name ?? "No input")
     }
 
     var statusAccessibilityLabel: String {
@@ -85,6 +85,7 @@ final class AudioDeviceStore {
                 }
             }
             refresh()
+            Diagnostics.record(.inputChanged)
             if let presetError {
                 errorMessage = "Input switched, but its saved volume could not be restored: \(presetError.localizedDescription)"
             }
@@ -108,6 +109,7 @@ final class AudioDeviceStore {
                 }
             }
             refresh()
+            Diagnostics.record(.outputChanged)
             if let presetError {
                 errorMessage = "Output switched, but its saved volume could not be restored: \(presetError.localizedDescription)"
             }
@@ -154,9 +156,22 @@ final class AudioDeviceStore {
         volumePresets.setValue(volume, for: device.uid, direction: .output)
     }
 
-    private func shortened(_ name: String) -> String {
-        let limit = 18
-        guard name.count > limit else { return name }
-        return String(name.prefix(limit - 1)) + "…"
+    nonisolated static func compactDeviceName(_ name: String) -> String {
+        var compact = name
+            .replacingOccurrences(of: "MacBook Pro", with: "MacBook", options: .caseInsensitive)
+
+        let removableSuffixes = [
+            " Microphone", " Speakers", " Camera", " Audio", " Built-in"
+        ]
+        for suffix in removableSuffixes {
+            if compact.range(of: suffix, options: [.anchored, .backwards, .caseInsensitive]) != nil {
+                compact.removeLast(suffix.count)
+            }
+        }
+
+        compact = compact.trimmingCharacters(in: .whitespacesAndNewlines)
+        let limit = 11
+        guard compact.count > limit else { return compact }
+        return String(compact.prefix(limit - 1)).trimmingCharacters(in: .whitespaces) + "…"
     }
 }

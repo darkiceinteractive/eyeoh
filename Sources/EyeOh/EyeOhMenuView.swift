@@ -42,8 +42,9 @@ struct EyeOhMenuView: View {
                     }
 
                     Button("Preview Preferred Camera…", systemImage: "video") {
+                        Diagnostics.record(.previewOpened)
                         openWindow(id: "camera-preview")
-                        CameraPreviewWindowPresenter.bringToFront()
+                        AppWindowPresenter.bringToFront(title: "Camera Preview")
                     }
                     .disabled(cameraStore.selectedCamera == nil)
                 }
@@ -80,8 +81,21 @@ struct EyeOhMenuView: View {
 
             Divider()
 
+            Button("EyeOh Help", systemImage: "questionmark.circle") {
+                openWindow(id: "help")
+                AppWindowPresenter.bringToFront(title: "EyeOh Help")
+            }
+
+            Button("Send Feedback…", systemImage: "envelope") {
+                FeedbackMail.open()
+                Diagnostics.record(.feedbackOpened)
+            }
+
+            Divider()
+
             Button("About EyeOh", systemImage: "info.circle") {
-                NSApplication.shared.orderFrontStandardAboutPanel(nil)
+                openWindow(id: "about")
+                AppWindowPresenter.bringToFront(title: "About EyeOh")
             }
 
             Button("Quit EyeOh", systemImage: "power") {
@@ -205,7 +219,7 @@ struct EyeOhMenuView: View {
 
     private func deviceLabel(_ device: AudioDevice, selected: Bool) -> some View {
         Label {
-            Text("\(device.name) — \(device.transport.rawValue)")
+            Text(compactMenuName(device.name))
                 .fontWeight(selected ? .semibold : .regular)
                 .foregroundStyle(
                     selected
@@ -221,11 +235,12 @@ struct EyeOhMenuView: View {
                 Image(systemName: device.transport.systemImage)
             }
         }
+        .help("\(device.name) · \(device.transport.rawValue)")
     }
 
     private func cameraLabel(_ camera: CameraDevice, selected: Bool) -> some View {
         Label {
-            Text("\(camera.name) — \(camera.kind.rawValue)")
+            Text(compactMenuName(camera.name))
                 .fontWeight(selected ? .semibold : .regular)
                 .foregroundStyle(
                     selected
@@ -241,6 +256,11 @@ struct EyeOhMenuView: View {
                 Image(systemName: camera.kind.systemImage)
             }
         }
+        .help("\(camera.name) · \(camera.kind.rawValue)")
+    }
+
+    private func compactMenuName(_ name: String) -> String {
+        name.replacingOccurrences(of: "MacBook Pro", with: "MacBook", options: .caseInsensitive)
     }
 
     private func openSoundSettings() {
@@ -248,39 +268,5 @@ struct EyeOhMenuView: View {
             string: "x-apple.systempreferences:com.apple.Sound-Settings.extension"
         ) else { return }
         NSWorkspace.shared.open(url)
-    }
-}
-
-@MainActor
-private enum CameraPreviewWindowPresenter {
-    private static let windowTitle = "Camera Preview"
-
-    static func bringToFront(attemptsRemaining: Int = 6) {
-        if let window = NSApplication.shared.windows.first(where: { $0.title == windowTitle }) {
-            var collectionBehavior = window.collectionBehavior
-            collectionBehavior.insert(.moveToActiveSpace)
-            window.collectionBehavior = collectionBehavior
-
-            if !NSScreen.screens.contains(where: { $0.visibleFrame.intersects(window.frame) }),
-               let screen = NSScreen.main ?? NSScreen.screens.first {
-                var frame = window.frame
-                frame.origin = NSPoint(
-                    x: screen.visibleFrame.midX - frame.width / 2,
-                    y: screen.visibleFrame.midY - frame.height / 2
-                )
-                window.setFrame(frame, display: false)
-            }
-
-            NSRunningApplication.current.activate(options: [.activateAllWindows])
-            window.makeKeyAndOrderFront(nil)
-            window.orderFrontRegardless()
-            return
-        }
-
-        guard attemptsRemaining > 0 else { return }
-        Task { @MainActor in
-            try? await Task.sleep(for: .milliseconds(100))
-            bringToFront(attemptsRemaining: attemptsRemaining - 1)
-        }
     }
 }

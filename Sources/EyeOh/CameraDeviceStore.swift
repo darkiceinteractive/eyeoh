@@ -30,6 +30,7 @@ final class CameraDeviceStore {
         do {
             try controller.setPreferredCamera(camera.id)
             refresh()
+            Diagnostics.record(.cameraChanged)
         } catch {
             errorMessage = error.localizedDescription
         }

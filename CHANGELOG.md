@@ -4,6 +4,11 @@ All notable changes will be recorded here. The project follows semantic versioni
 
 ## Unreleased
 
+- Shortened the menu-bar device indicator and removed redundant transport labels from menu rows.
+- Added branded Help and About windows plus pre-addressed feedback email.
+- Added a privacy-safe local diagnostics vocabulary and documented the gate for future opt-in network telemetry.
+- Raised camera, Help and About windows onto the active desktop when opened from the menu bar.
+
 ## 0.3.0 — EyeOh release candidate
 
 - Renamed the product, executable, bundle, archive, website, and public identifier to EyeOh.
