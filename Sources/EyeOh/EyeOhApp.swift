@@ -9,12 +9,18 @@ struct EyeOhApp: App {
     @State private var launchAtLogin: LaunchAtLoginController
 
     init() {
-        Diagnostics.record(.appLaunched)
         let store = AudioDeviceStore(controller: CoreAudioClient())
         store.startMonitoring()
+        let preferences = AppPreferences()
+        preferences.reconcileProviderAvailability(
+            statisticsAvailable: Telemetry.shared.hasStatisticsProvider,
+            crashReportingAvailable: Telemetry.shared.hasCrashReportingProvider
+        )
+        preferences.activateTelemetry()
+        Diagnostics.record(.appLaunched)
         _store = State(initialValue: store)
         _cameraStore = State(initialValue: CameraDeviceStore(controller: AVCameraClient()))
-        _preferences = State(initialValue: AppPreferences())
+        _preferences = State(initialValue: preferences)
         _launchAtLogin = State(initialValue: LaunchAtLoginController())
     }
 

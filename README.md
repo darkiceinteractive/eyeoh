@@ -53,9 +53,9 @@ The public website lives in `Website/`. Its download is populated only after an 
 
 ## Privacy and diagnostics
 
-Anonymous statistics and crash reporting are both off by default. The current build does not contain a third-party analytics or crash-reporting SDK and makes no telemetry network requests. If anonymous statistics are enabled, a small privacy-safe event vocabulary is written only to macOS Unified Logging without device names, identifiers, audio or video. See `TELEMETRY.md` for the readiness gate that must be completed before any optional network diagnostics can be introduced.
+Usage statistics and crash reporting are separate and off by default. Official release builds can inject a PostHog EU project token and Sentry EU DSN at packaging time; source builds without those values remain offline. PostHog receives only six fixed feature events under a random installation identifier. Sentry is configured for crashes and hangs only. Neither path includes device names, recordings, screenshots, contact details or free text. See `TELEMETRY.md` for the exact schema and release validation gate.
 
-For direct-download crashes, users can send feedback and attach the crash report macOS creates. App Store builds can additionally use Apple's opt-in crash and usage reports. The in-app feedback action never attaches a recording or device list.
+PostHog uses a small first-party HTTPS reporter rather than its general mobile SDK, eliminating autocapture, replay, feature flags and person profiles from the binary. Sentry is the only diagnostic SDK because native crash capture requires it. The in-app feedback action never attaches a recording or device list.
 
 ## Contributing
 

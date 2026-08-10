@@ -9,6 +9,10 @@ MINIMUM_MACOS_VERSION="14.0"
 SIGNING_MODE=${SIGNING_MODE:-adhoc}
 APP_IDENTITY=${APP_IDENTITY:-}
 APP_ENTITLEMENTS=${APP_ENTITLEMENTS:-"$PROJECT_ROOT/Config/EyeOh-Direct.entitlements"}
+POSTHOG_PROJECT_TOKEN=${POSTHOG_PROJECT_TOKEN:-}
+POSTHOG_HOST=${POSTHOG_HOST:-}
+SENTRY_DSN=${SENTRY_DSN:-}
+DISTRIBUTION_CHANNEL=${DISTRIBUTION_CHANNEL:-source}
 
 cd "$PROJECT_ROOT"
 # version.env is resolved from the repository root at runtime.
@@ -42,6 +46,12 @@ else
 fi
 chmod +x "$BINARY_DESTINATION"
 
+DSYM_BUNDLE="$PROJECT_ROOT/build/$APP_NAME.app.dSYM"
+rm -rf "$DSYM_BUNDLE"
+if [[ "$CONFIGURATION" == "release" ]]; then
+    xcrun dsymutil "$BINARY_DESTINATION" -o "$DSYM_BUNDLE"
+fi
+
 cat > "$APP_BUNDLE/Contents/Info.plist" <<PLIST
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -65,9 +75,28 @@ cat > "$APP_BUNDLE/Contents/Info.plist" <<PLIST
 </plist>
 PLIST
 
+/usr/bin/plutil -insert EyeOhDistributionChannel -string "$DISTRIBUTION_CHANNEL" "$APP_BUNDLE/Contents/Info.plist"
+if [[ -n "$POSTHOG_PROJECT_TOKEN" && -n "$POSTHOG_HOST" ]]; then
+    if [[ "$POSTHOG_HOST" != "https://eu.i.posthog.com" ]]; then
+        echo "Official EyeOh builds require POSTHOG_HOST=https://eu.i.posthog.com" >&2
+        exit 1
+    fi
+    /usr/bin/plutil -insert EyeOhPostHogProjectToken -string "$POSTHOG_PROJECT_TOKEN" "$APP_BUNDLE/Contents/Info.plist"
+    /usr/bin/plutil -insert EyeOhPostHogHost -string "$POSTHOG_HOST" "$APP_BUNDLE/Contents/Info.plist"
+fi
+if [[ -n "$SENTRY_DSN" ]]; then
+    if [[ "$SENTRY_DSN" != *".ingest.de.sentry.io/"* ]]; then
+        echo "Official EyeOh builds require a Sentry EU-region DSN." >&2
+        exit 1
+    fi
+    /usr/bin/plutil -insert EyeOhSentryDSN -string "$SENTRY_DSN" "$APP_BUNDLE/Contents/Info.plist"
+fi
+
 if [[ -f "$PROJECT_ROOT/Icon.icns" ]]; then
     cp "$PROJECT_ROOT/Icon.icns" "$APP_BUNDLE/Contents/Resources/Icon.icns"
 fi
+cp "$PROJECT_ROOT/Config/EyeOh-PrivacyInfo.xcprivacy" "$APP_BUNDLE/Contents/Resources/PrivacyInfo.xcprivacy"
+cp "$PROJECT_ROOT/THIRD_PARTY_NOTICES.md" "$APP_BUNDLE/Contents/Resources/THIRD_PARTY_NOTICES.md"
 
 xattr -cr "$APP_BUNDLE"
 
@@ -82,3 +111,6 @@ else
 fi
 
 echo "Created $APP_BUNDLE"
+if [[ -d "$DSYM_BUNDLE" ]]; then
+    echo "Created $DSYM_BUNDLE"
+fi

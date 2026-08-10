@@ -8,7 +8,9 @@ All notable changes will be recorded here. The project follows semantic versioni
 - Formalised the MIT Core and future proprietary Pro boundary, IP provenance record, contributor licence agreement and pull-request acceptance workflow.
 - Shortened the menu-bar device indicator and removed redundant transport labels from menu rows.
 - Added branded Help and About views plus pre-addressed feedback email.
-- Added a privacy-safe local diagnostics vocabulary and documented the gate for future opt-in network telemetry.
+- Added separate off-by-default PostHog EU usage statistics and Sentry EU crash reporting, with release-only configuration, strict event allowlisting, IP/privacy controls and source builds offline by default.
+- Rebuilt the public site as an accessible Astro static build for Cloudflare Pages, with a responsive product illustration and complete privacy/support routes.
+- Replaced the generic Dark Ice cube tile with EyeOh's own minimal input–pulse–output mark in the Dark Ice palette.
 - Raised camera preview and Settings onto the active desktop when opened from the menu bar.
 
 ## 0.3.0 — EyeOh release candidate

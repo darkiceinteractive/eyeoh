@@ -6,7 +6,7 @@ PROJECT_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 # shellcheck disable=SC1091
 source "$PROJECT_ROOT/version.env"
 
-if ! grep -Fq "Version $MARKETING_VERSION" "$PROJECT_ROOT/Website/index.html"; then
+if ! grep -Fq "Version $MARKETING_VERSION" "$PROJECT_ROOT/Website/src/pages/index.astro"; then
     echo "Website version does not match MARKETING_VERSION=$MARKETING_VERSION." >&2
     exit 1
 fi

@@ -15,7 +15,7 @@ EyeOh's core behaviour is not prohibited by the current guidelines:
 - It uses Apple's documented Core Audio device and default-input/default-output selectors.
 - Camera discovery, preference, and preview use public AVFoundation APIs. Preview is user-initiated and frames are not recorded, stored, or transmitted.
 - It is a self-contained menu-bar utility and does not install a driver, helper, kernel extension, or privileged component.
-- It does not capture microphone audio, request microphone access, create an account, or make telemetry network requests. Camera access is requested only for an explicitly opened local preview. If the user opts into anonymous statistics, non-identifying product events are written only to local macOS Unified Logging.
+- It does not capture microphone audio, request microphone access, or create an account. Camera access is requested only for an explicitly opened local preview. Separate off-by-default choices can send a fixed product-event schema to PostHog EU and stripped crash/hang diagnostics to Sentry EU in an official configured build.
 - Per-device volume presets are stored locally in app preferences and never uploaded.
 - Its audio switching is substantial native utility rather than a repackaged website.
 
@@ -25,11 +25,12 @@ The gates are:
 2. The submission must be packaged using Xcode technology, be self-contained, and use App Store updates under 2.4.5(ii) and (vii).
 3. The app must use public APIs under guideline 2.5.1. The Core Audio constants and AVFoundation camera preference used by EyeOh are publicly documented.
 4. App Review still has discretion under minimum-functionality guideline 4.2; a focused utility is defensible, but approval cannot be guaranteed.
-5. A Mac App Store bundle needs an App Store Connect record, Mac Distribution signing/provisioning, screenshots, metadata, support/privacy URLs, and the “Data Not Collected” privacy response.
+5. A Mac App Store bundle needs an App Store Connect record, Mac Distribution signing/provisioning, screenshots, metadata, support/privacy URLs, and accurate App Privacy answers. With the optional providers enabled, “Data Not Collected” is no longer accurate: Product Interaction and Crash Data must be declared for Analytics/App Functionality, not used for tracking, and assessed carefully as not linked to identity. The random installation identifier may also require an identifier disclosure; confirm the final App Store Connect questionnaire rather than guessing.
 
 Prepared locally:
 
-- `Config/EyeOh-MAS.entitlements` enables App Sandbox and its public camera capability for preview.
+- `Config/EyeOh-MAS.entitlements` enables App Sandbox, its public camera capability for preview, and outgoing network access required only when the user enables an optional reporting provider.
+- `Config/EyeOh-PrivacyInfo.xcprivacy` declares the optional product-interaction, random identifier, crash, hang/performance, and diagnostic categories as not linked and not used for tracking, plus the required-reason APIs used by EyeOh/Sentry.
 - `Scripts/test_mas_sandbox.sh` compiles a probe that enumerates devices and validates the current defaults inside App Sandbox. With `EYEOH_PROBE_WRITES=1`, it performs a state-restoring write check and restores input, normal output, and the independently selected system-sound output before exiting.
 - The normal test suite is deterministic and does not depend on or write to attached audio hardware.
 - A real-device write check is available only with `EYEOH_RUN_HARDWARE_TESTS=1`; it snapshots and restores input, output, and the separate system-sound output.
@@ -79,7 +80,7 @@ Current local state (machine-specific signing details intentionally omitted):
 
 - EyeOh `0.3.0 (5)` is built as a universal `arm64` + `x86_64` app, signed with the Dark Ice Developer ID certificate, and archived at `dist/EyeOh-0.3.0.zip`. Signature verification passes; it remains intentionally unnotarized until submission is authorized.
 - `Scripts/release_direct.sh` builds a universal Apple Silicon/Intel app, signs it with the `APP_IDENTITY` supplied by the maintainer, verifies it, and creates a ZIP.
-- Passing `--notarize` submits through `notarytool`, staples and validates the ticket, verifies Gatekeeper acceptance, then creates `Website/downloads/EyeOh.zip`.
+- Passing `--notarize` submits through `notarytool`, staples and validates the ticket, verifies Gatekeeper acceptance, then creates `Website/public/downloads/EyeOh.zip` for the Astro build.
 - Notary credentials have not been assumed or tested. Set `NOTARY_PROFILE` to an existing `notarytool` Keychain profile only when publication is authorized.
 
 Primary sources:
@@ -116,10 +117,11 @@ Primary sources:
 - [x] Default-device eligibility filtering and capability-aware input/output volume implemented with public Core Audio APIs.
 - [x] Deterministic default tests plus an explicitly opt-in, state-restoring real-device integration test.
 - [x] Menu-bar-only bundle and native accessible menu.
-- [x] Static product website with an honest branded hero while the final EyeOh menu screenshot is pending.
+- [x] Astro/Cloudflare Pages product website with an honest branded interface illustration while the final release screenshot is pending.
 - [x] MIT software license, separate Dark Ice trademark policy, and accurate privacy language.
 - [x] Documented the MIT Core/commercial Pro boundary, current IP provenance, and CLA-gated external contribution process.
-- [x] Branded Help and About views, feedback mail action, and a documented privacy gate for future network diagnostics.
+- [x] Branded Help and About views, feedback mail action, and an implemented opt-in diagnostics boundary.
+- [x] EU-only PostHog and Sentry release configuration with source builds offline by default.
 - [x] Native Settings window with Service Management launch-at-login, separate off-by-default reporting choices, and consolidated Help/About/system actions.
 - [x] Universal-build, Developer ID, Hardened Runtime, ZIP, and notarization scripts.
 - [x] Rerun the App Sandbox probe for `au.com.darkice.eyeoh`, including the explicitly opt-in state-restoring write check.
@@ -127,6 +129,7 @@ Primary sources:
 - [x] Freeze the public name as EyeOh, bundle ID as `au.com.darkice.eyeoh`, and executable as `EyeOh`.
 - [ ] Confirm the final EyeOh app icon, public domain, and repository name.
 - [ ] Add the final repository, support, and privacy URLs to release metadata and the website.
+- [ ] Complete the provider-side and receipt checks in `TELEMETRY.md`; current source build has no provider credentials.
 - [ ] Configure or identify a `notarytool` Keychain profile.
 - [ ] Explicitly authorize notarization submission.
 - [ ] Notarize, staple, verify Gatekeeper, and smoke-test the downloaded ZIP on a clean user account.

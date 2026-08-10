@@ -19,4 +19,34 @@ final class AppPreferencesTests: XCTestCase {
         XCTAssertTrue(restored.anonymousStatisticsEnabled)
         XCTAssertTrue(restored.crashReportingEnabled)
     }
+
+    func testEarlierPlaceholderChoicesDoNotBecomeNetworkConsent() {
+        let suiteName = "EyeOhTests.\(UUID().uuidString)"
+        let defaults = UserDefaults(suiteName: suiteName)!
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+        defaults.set(true, forKey: AppPreferenceKeys.anonymousStatistics)
+        defaults.set(true, forKey: AppPreferenceKeys.crashReporting)
+
+        let migrated = AppPreferences(defaults: defaults)
+
+        XCTAssertFalse(migrated.anonymousStatisticsEnabled)
+        XCTAssertFalse(migrated.crashReportingEnabled)
+    }
+
+    func testUnavailableProvidersCannotLeaveConsentEnabled() {
+        let suiteName = "EyeOhTests.\(UUID().uuidString)"
+        let defaults = UserDefaults(suiteName: suiteName)!
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+        let preferences = AppPreferences(defaults: defaults)
+        preferences.anonymousStatisticsEnabled = true
+        preferences.crashReportingEnabled = true
+
+        preferences.reconcileProviderAvailability(
+            statisticsAvailable: false,
+            crashReportingAvailable: false
+        )
+
+        XCTAssertFalse(preferences.anonymousStatisticsEnabled)
+        XCTAssertFalse(preferences.crashReportingEnabled)
+    }
 }

@@ -1,9 +1,9 @@
 import OSLog
 
-/// Privacy-safe instrumentation boundary. Events are recorded locally only
-/// after the user opts in. The current build has no network reporting provider.
+/// Privacy-safe instrumentation boundary. Only this fixed vocabulary can leave
+/// the app, and only after the corresponding preference is enabled.
 enum Diagnostics {
-    enum Event: String {
+    enum Event: String, CaseIterable {
         case appLaunched = "app_launched"
         case feedbackOpened = "feedback_opened"
         case previewOpened = "preview_opened"
@@ -17,13 +17,20 @@ enum Diagnostics {
         category: "product-events"
     )
 
-    static let hasStatisticsProvider = false
-    static let hasCrashReportingProvider = false
+    @MainActor static var hasStatisticsProvider: Bool {
+        Telemetry.shared.hasStatisticsProvider
+    }
 
+    @MainActor static var hasCrashReportingProvider: Bool {
+        Telemetry.shared.hasCrashReportingProvider
+    }
+
+    @MainActor
     static func record(_ event: Event) {
         guard UserDefaults.standard.bool(forKey: AppPreferenceKeys.anonymousStatistics) else {
             return
         }
         logger.info("Event: \(event.rawValue, privacy: .public)")
+        Telemetry.shared.capture(event)
     }
 }

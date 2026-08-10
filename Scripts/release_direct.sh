@@ -33,9 +33,14 @@ SIGNING_MODE=developer-id \
 APP_IDENTITY="$APP_IDENTITY" \
 APP_ENTITLEMENTS="$PROJECT_ROOT/Config/EyeOh-Direct.entitlements" \
 ARCHES="arm64 x86_64" \
+DISTRIBUTION_CHANNEL="${DISTRIBUTION_CHANNEL:-direct}" \
+POSTHOG_PROJECT_TOKEN="${POSTHOG_PROJECT_TOKEN:-}" \
+POSTHOG_HOST="${POSTHOG_HOST:-}" \
+SENTRY_DSN="${SENTRY_DSN:-}" \
 "$PROJECT_ROOT/Scripts/package_app.sh" release
 
 APP_BUNDLE="$PROJECT_ROOT/build/EyeOh.app"
+DSYM_BUNDLE="$PROJECT_ROOT/build/EyeOh.app.dSYM"
 DIST_DIR="$PROJECT_ROOT/dist"
 ARCHIVE="$DIST_DIR/EyeOh-$MARKETING_VERSION.zip"
 mkdir -p "$DIST_DIR"
@@ -43,6 +48,18 @@ rm -f "$ARCHIVE"
 ditto -c -k --keepParent --norsrc --noextattr --noqtn --noacl "$APP_BUNDLE" "$ARCHIVE"
 
 codesign --verify --deep --strict --verbose=2 "$APP_BUNDLE"
+
+if [[ -n "${SENTRY_DSN:-}" ]]; then
+    if [[ -z "${SENTRY_AUTH_TOKEN:-}" || -z "${SENTRY_ORG:-}" || -z "${SENTRY_PROJECT:-}" ]]; then
+        echo "Configured Sentry releases require SENTRY_AUTH_TOKEN, SENTRY_ORG and SENTRY_PROJECT for dSYM upload." >&2
+        exit 1
+    fi
+    if ! command -v sentry-cli >/dev/null 2>&1; then
+        echo "sentry-cli is required to upload release dSYMs." >&2
+        exit 1
+    fi
+    sentry-cli debug-files upload --org "$SENTRY_ORG" --project "$SENTRY_PROJECT" "$DSYM_BUNDLE"
+fi
 
 if [[ "$NOTARIZE" == "1" ]]; then
     if [[ -z "$NOTARY_PROFILE" ]]; then
@@ -58,9 +75,9 @@ if [[ "$NOTARIZE" == "1" ]]; then
     ditto -c -k --keepParent --norsrc --noextattr --noqtn --noacl "$APP_BUNDLE" "$ARCHIVE"
     spctl --assess --type execute --verbose=2 "$APP_BUNDLE"
 
-    mkdir -p "$PROJECT_ROOT/Website/downloads"
-    cp "$ARCHIVE" "$PROJECT_ROOT/Website/downloads/EyeOh.zip"
-    echo "Notarized website download created at Website/downloads/EyeOh.zip"
+    mkdir -p "$PROJECT_ROOT/Website/public/downloads"
+    cp "$ARCHIVE" "$PROJECT_ROOT/Website/public/downloads/EyeOh.zip"
+    echo "Notarized website download created at Website/public/downloads/EyeOh.zip"
 else
     echo "Created signed release candidate at $ARCHIVE"
     echo "It has not been notarized and was not copied into the public website."

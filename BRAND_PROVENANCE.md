@@ -9,7 +9,7 @@ EyeOh uses the current live Dark Ice identity rather than a newly drawn approxim
 - Live brand tokens: Ice Blue `#008BB4`, Lime `#A0CE4E`
 - Canonical logo charcoal face: `#323643`
 
-`Website/assets/eyeoh-mark.svg` places the three unchanged canonical cube paths on a deep-charcoal application tile. It does not redraw the source geometry. The native selected state uses Ice Blue text plus a Lime filled checkmark, retaining font weight and a check glyph so selection never depends on colour alone.
+`Website/assets/eyeoh-mark.svg` is EyeOh's own route-and-pulse mark: Lime enters, a white three-bar pulse sits at the I/O boundary, and Ice Blue exits, all on the deep-charcoal application tile. The geometry is original to EyeOh; the palette connects it to Dark Ice. The native selected state uses Ice Blue text plus a Lime filled checkmark, retaining font weight and a check glyph so selection never depends on colour alone.
 
 An internal 2026 brand guide lists a proposed brighter DI Blue (`#009DCA`). EyeOh deliberately follows the live site value because the product brief explicitly requests `darkice.au` branding.
 

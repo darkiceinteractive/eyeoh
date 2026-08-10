@@ -1,0 +1,81 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ProductMenu from '../components/ProductMenu.astro';
+import logo from '../../assets/eyeoh-mark.svg';
+
+const downloadURL = import.meta.env.PUBLIC_DOWNLOAD_URL;
+---
+<BaseLayout
+  title="EyeOh by Dark Ice — Mac audio and camera switching"
+  description="EyeOh is a free native macOS menu-bar app for switching microphones and speakers and choosing a preferred camera in one click."
+>
+  <section class="hero" id="top">
+    <div class="container hero-grid">
+      <div class="hero-copy">
+        <p class="eyebrow">A free Dark Ice utility for macOS</p>
+        <h1>Your Mac’s I/O, one click away.</h1>
+        <p class="lede">Switch microphones and speakers, restore the right volume, and choose your preferred camera from one quiet menu.</p>
+        <p class="route-note">EyeOh changes macOS audio defaults and camera preference. Apps pinned to a named device can still keep their own selection.</p>
+        <div class="hero-actions">
+          {downloadURL ? (
+            <a class="button button-primary" href={downloadURL}>Download EyeOh — Free</a>
+          ) : (
+            <span class="button button-primary" aria-disabled="true">Download coming soon — Free</span>
+          )}
+          <a class="text-link" href="#install">How to install <span aria-hidden="true">→</span></a>
+        </div>
+        <p class="release-meta">Version 0.3.0 · macOS 14 or later · Apple Silicon and Intel</p>
+      </div>
+      <div class="product-stage"><div class="ambient" aria-hidden="true"></div><ProductMenu /></div>
+    </div>
+  </section>
+
+  <section class="features section" id="features" aria-labelledby="features-title">
+    <div class="container">
+      <p class="eyebrow">One menu. Every meeting route.</p>
+      <h2 id="features-title">The choices you change every day, without the trip through Settings.</h2>
+      <div class="feature-grid">
+        <article><span class="feature-icon" aria-hidden="true">↳</span><h3>Input, instantly</h3><p>Move between built-in, USB, Bluetooth, and useful virtual microphones with a click.</p></article>
+        <article><span class="feature-icon" aria-hidden="true">↗</span><h3>Output, too</h3><p>Send apps and system sounds to speakers, displays, audio interfaces, or headphones.</p></article>
+        <article><span class="feature-icon" aria-hidden="true">≋</span><h3>Your levels, remembered</h3><p>EyeOh restores a preferred input gain or output volume for each capable device.</p></article>
+        <article><span class="feature-icon" aria-hidden="true">▣</span><h3>See the angle first</h3><p>Choose a preferred camera and open a private live preview only when you want it.</p></article>
+      </div>
+    </div>
+  </section>
+
+  <section class="how section" id="install" aria-labelledby="install-title">
+    <div class="container split-panel">
+      <div><p class="eyebrow">Up and running</p><h2 id="install-title">Three small steps.</h2><p>EyeOh lives in the menu bar, with no Dock icon, driver, account, or background helper.</p></div>
+      <ol class="steps">
+        <li><span>1</span><div><strong>Download</strong><p>Open the ZIP and move EyeOh to Applications.</p></div></li>
+        <li><span>2</span><div><strong>Open</strong><p>Launch it once. EyeOh’s route symbol appears in the menu bar.</p></div></li>
+        <li><span>3</span><div><strong>Choose</strong><p>Pick an input, output, or preferred camera. Preview only when needed.</p></div></li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="privacy section" aria-labelledby="privacy-title">
+    <div class="container privacy-panel">
+      <div class="privacy-mark" aria-hidden="true">✓</div>
+      <div><p class="eyebrow">Private by default</p><h2 id="privacy-title">EyeOh never listens or records.</h2><p>Device choices and volume presets stay on your Mac. Camera access is used only for a preview you explicitly open. Optional product statistics and crash reporting are separate, off by default, minimised, and can be withdrawn at any time.</p><p><a href="/privacy/">Read exactly what can be sent →</a></p></div>
+    </div>
+  </section>
+
+  <section class="faq section" id="faq" aria-labelledby="faq-title">
+    <div class="container faq-wrap">
+      <div><p class="eyebrow">Good to know</p><h2 id="faq-title">Questions, answered.</h2></div>
+      <div class="faq-list">
+        <details><summary>Why didn’t Teams or Zoom change devices?</summary><p>Meeting apps can be pinned to a named device. Choose “Default” or “System” in that app so it follows EyeOh.</p></details>
+        <details><summary>Does EyeOh need microphone permission?</summary><p>No. It changes device settings but never captures microphone audio.</p></details>
+        <details><summary>Why does camera preview need permission?</summary><p>macOS requires permission to show a live view. EyeOh asks only when you open Preview and stops when you close it.</p></details>
+        <details><summary>Can I use my iPhone camera?</summary><p>Yes. An eligible nearby iPhone made available by Apple Continuity Camera appears automatically.</p></details>
+        <details><summary>What do the privacy switches send?</summary><p>Nothing while off. Statistics are six fixed feature events; crash reporting is technical crash/hang data. Neither includes device names, recordings, screenshots, or contact details.</p></details>
+        <details><summary>Is EyeOh open source?</summary><p>Yes. EyeOh Core is MIT-licensed. Official Dark Ice names and artwork are protected separately.</p></details>
+      </div>
+    </div>
+  </section>
+
+  <section class="final-cta section" aria-labelledby="download-title">
+    <div class="container final-panel"><img src={logo.src} width="72" height="72" alt="" /><h2 id="download-title">Audio and video routes, finally within reach.</h2><p>Small, native, private by default, and free.</p>{downloadURL ? <a class="button button-primary" href={downloadURL}>Download EyeOh — Free</a> : <span class="button button-primary" aria-disabled="true">Release coming soon</span>}</div>
+  </section>
+</BaseLayout>

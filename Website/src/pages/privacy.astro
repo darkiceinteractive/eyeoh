@@ -1,0 +1,31 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+<BaseLayout title="Privacy — EyeOh" description="EyeOh privacy policy and optional diagnostics details.">
+  <article class="container legal-copy legal-page">
+    <p class="eyebrow">Privacy</p>
+    <h1>Private first, and specific about the rest.</h1>
+    <p>Last updated 10 August 2026.</p>
+    <p>Dark Ice Interactive Pty Ltd (“Dark Ice”) is responsible for EyeOh. The app reads audio and camera device information that macOS exposes locally and changes a preference only when you choose a device.</p>
+
+    <h2>Core app data stays on your Mac</h2>
+    <p>EyeOh does not record microphone audio or camera video, create an account, read contacts, display advertising, or sell data. Camera access is requested only when you explicitly open the local live preview; the capture session stops when the window closes. Device names, macOS device identifiers, and per-device volume presets remain on your Mac.</p>
+
+    <h2>Optional product statistics</h2>
+    <p>“Share private usage statistics” is off by default. If you turn it on, EyeOh sends one of six fixed events—app launched, input changed, output changed, camera changed, preview opened, or feedback opened—to PostHog’s EU service. Each event includes a random installation identifier, EyeOh version and build, distribution channel, and schema version. EyeOh disables IP geolocation and does not create a PostHog person profile.</p>
+    <p>These events never contain device or camera names, hardware identifiers, volume levels, audio, video, screenshots, email content, or free text. The identifier is pseudonymous: it recognises an installation over time but is not connected to an EyeOh account or your contact details.</p>
+
+    <h2>Optional crash reporting</h2>
+    <p>“Share crash reports” is also off by default and independent of statistics. If enabled, Sentry’s EU service receives native crash and app-hang diagnostics, including stack traces, EyeOh version, macOS version, and technical system context needed to diagnose the failure. EyeOh disables performance tracing, session tracking, network and UI breadcrumbs, logs, screenshots, attachments, memory introspection, and default personal information. It does not assign the analytics identifier to Sentry.</p>
+
+    <h2>Choice, retention and deletion</h2>
+    <p>You can withdraw either choice at any time in EyeOh → Settings → Privacy. Disabling statistics immediately cancels its analytics session. Disabling crash reporting uninstalls Sentry and removes its local cache. It does not retract data already received.</p>
+    <p>Dark Ice will configure product-event retention to 12 months or less. Sentry’s Developer plan currently provides a 30-day lookback. You may request deletion or ask a privacy question at <a href="mailto:darkice@darkice.co?subject=EyeOh%20privacy">darkice@darkice.co</a>. Because EyeOh has no account and the analytics identifier is not linked to a name or email, use the Copy button beside Analytics ID in EyeOh Settings when a specific-event search is required.</p>
+
+    <h2>Processors and safeguards</h2>
+    <p>PostHog and Sentry act as service providers for the optional purposes described above. Official EyeOh builds accept only their EU ingestion endpoints. Dark Ice does not use this information for advertising or tracking across other companies’ apps or websites, and does not enable third-party AI analysis for this project.</p>
+
+    <h2>Website</h2>
+    <p>The EyeOh website is statically hosted on Cloudflare. It does not currently set analytics or advertising cookies. Cloudflare may process ordinary request and security logs as part of hosting the site under its own terms.</p>
+  </article>
+</BaseLayout>

@@ -92,26 +92,45 @@ private struct PrivacySettingsView: View {
 
     var body: some View {
         Form {
-            Section("Anonymous statistics") {
-                Toggle("Allow anonymous statistics", isOn: $preferences.anonymousStatisticsEnabled)
+            Section("Usage statistics") {
+                Toggle("Share private usage statistics", isOn: $preferences.anonymousStatisticsEnabled)
+                    .disabled(!Diagnostics.hasStatisticsProvider)
 
-                Text("Allows counts such as app launches, device switches and camera previews. EyeOh never includes device names, identifiers, audio, video or free text.")
+                Text("Allows counts such as app launches, device switches and camera previews. Events use a random installation identifier. EyeOh never includes device names, hardware identifiers, audio, video or free text.")
                     .font(.callout)
                     .foregroundStyle(.secondary)
 
-                if !Diagnostics.hasStatisticsProvider {
+                if Diagnostics.hasStatisticsProvider {
+                    providerNotice("PostHog is available in this official build. Nothing is sent unless this switch is on.")
+
+                    if preferences.anonymousStatisticsEnabled,
+                       let identifier = Telemetry.shared.supportAnalyticsIdentifier {
+                        LabeledContent("Analytics ID") {
+                            Button("Copy") {
+                                NSPasteboard.general.clearContents()
+                                NSPasteboard.general.setString(identifier, forType: .string)
+                            }
+                        }
+                        Text("Use this random ID only if asking Dark Ice to find or delete your statistics.")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                } else {
                     providerNotice("No statistics service is connected in this build, so nothing is sent from your Mac.")
                 }
             }
 
             Section("Crash reporting") {
-                Toggle("Allow anonymous crash reporting", isOn: $preferences.crashReportingEnabled)
+                Toggle("Share crash reports", isOn: $preferences.crashReportingEnabled)
+                    .disabled(!Diagnostics.hasCrashReportingProvider)
 
                 Text("Allows technical crash diagnostics to be submitted without recordings, device lists or contact details.")
                     .font(.callout)
                     .foregroundStyle(.secondary)
 
-                if !Diagnostics.hasCrashReportingProvider {
+                if Diagnostics.hasCrashReportingProvider {
+                    providerNotice("Sentry is available in this official build. Nothing is sent unless this switch is on.")
+                } else {
                     providerNotice("No crash-reporting service is connected in this build. You can still send feedback and attach a macOS crash report.")
                 }
             }
@@ -121,6 +140,11 @@ private struct PrivacySettingsView: View {
                     FeedbackMail.open()
                     Diagnostics.record(.feedbackOpened)
                 }
+
+                Link(
+                    "Read Privacy Policy…",
+                    destination: URL(string: "https://eyeoh.app/privacy/")!
+                )
             } footer: {
                 Text("Both reporting choices are off by default and can be changed at any time.")
             }

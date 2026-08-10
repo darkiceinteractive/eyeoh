@@ -5,6 +5,11 @@ Design/
 build/
 dist/
 Website/downloads/
+Website/public/downloads/
+Website/node_modules/
+Website/dist/
+Website/.astro/
+Website/artifacts/
 Icon.icns
 *.xcodeproj/
 xcuserdata/

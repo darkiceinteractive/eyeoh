@@ -5,25 +5,57 @@ import ServiceManagement
 enum AppPreferenceKeys {
     static let anonymousStatistics = "privacy.anonymousStatistics"
     static let crashReporting = "privacy.crashReporting"
+    static let telemetryConsentVersion = "privacy.telemetryConsentVersion"
 }
 
 @MainActor
 @Observable
 final class AppPreferences {
+    private static let currentConsentVersion = 1
     private let defaults: UserDefaults
 
     var anonymousStatisticsEnabled: Bool {
-        didSet { defaults.set(anonymousStatisticsEnabled, forKey: AppPreferenceKeys.anonymousStatistics) }
+        didSet {
+            defaults.set(anonymousStatisticsEnabled, forKey: AppPreferenceKeys.anonymousStatistics)
+            Telemetry.shared.setStatisticsEnabled(anonymousStatisticsEnabled)
+        }
     }
 
     var crashReportingEnabled: Bool {
-        didSet { defaults.set(crashReportingEnabled, forKey: AppPreferenceKeys.crashReporting) }
+        didSet {
+            defaults.set(crashReportingEnabled, forKey: AppPreferenceKeys.crashReporting)
+            Telemetry.shared.setCrashReportingEnabled(crashReportingEnabled)
+        }
     }
 
     init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
-        anonymousStatisticsEnabled = defaults.bool(forKey: AppPreferenceKeys.anonymousStatistics)
-        crashReportingEnabled = defaults.bool(forKey: AppPreferenceKeys.crashReporting)
+        if defaults.integer(forKey: AppPreferenceKeys.telemetryConsentVersion) >= Self.currentConsentVersion {
+            anonymousStatisticsEnabled = defaults.bool(forKey: AppPreferenceKeys.anonymousStatistics)
+            crashReportingEnabled = defaults.bool(forKey: AppPreferenceKeys.crashReporting)
+        } else {
+            anonymousStatisticsEnabled = false
+            crashReportingEnabled = false
+            defaults.set(false, forKey: AppPreferenceKeys.anonymousStatistics)
+            defaults.set(false, forKey: AppPreferenceKeys.crashReporting)
+            defaults.set(Self.currentConsentVersion, forKey: AppPreferenceKeys.telemetryConsentVersion)
+        }
+    }
+
+    func reconcileProviderAvailability(statisticsAvailable: Bool, crashReportingAvailable: Bool) {
+        if !statisticsAvailable {
+            anonymousStatisticsEnabled = false
+        }
+        if !crashReportingAvailable {
+            crashReportingEnabled = false
+        }
+    }
+
+    func activateTelemetry() {
+        Telemetry.shared.configure(
+            statisticsEnabled: anonymousStatisticsEnabled,
+            crashReportingEnabled: crashReportingEnabled
+        )
     }
 }
 

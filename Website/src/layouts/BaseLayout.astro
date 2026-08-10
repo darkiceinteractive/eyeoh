@@ -1,0 +1,57 @@
+---
+import logo from '../../assets/eyeoh-mark.svg';
+import '../../styles.css';
+
+interface Props {
+  title: string;
+  description: string;
+}
+
+const { title, description } = Astro.props;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+---
+<!doctype html>
+<html lang="en-AU">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#f8fafc" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0a1218" media="(prefers-color-scheme: dark)" />
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" href={logo.src} type="image/svg+xml" />
+    <title>{title}</title>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to main content</a>
+    <header class="site-header">
+      <div class="container header-inner">
+        <a class="brand" href="/" aria-label="EyeOh home">
+          <img src={logo.src} width="34" height="34" alt="" />
+          <span class="brand-lockup"><strong>EyeOh</strong><small>by Dark Ice</small></span>
+        </a>
+        <nav aria-label="Main navigation">
+          <a href="/#features">Features</a>
+          <a href="/#faq">FAQ</a>
+          <a href="/support/">Support</a>
+          <span class="button button-small" aria-disabled="true">Free · Coming soon</span>
+        </nav>
+      </div>
+    </header>
+    <main id="main"><slot /></main>
+    <footer>
+      <div class="container footer-inner">
+        <a class="brand footer-brand" href="/">
+          <img src={logo.src} width="28" height="28" alt="" />
+          <span class="brand-lockup"><strong>EyeOh</strong><small>by Dark Ice</small></span>
+        </a>
+        <p>Built by Dark Ice Interactive. No account. Optional diagnostics stay off until you choose otherwise.</p>
+        <div class="footer-links">
+          <a href="/support/">Support</a>
+          <a href="/privacy/">Privacy</a>
+          <a href="https://darkice.au/">darkice.au</a>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

@@ -1,9 +1,13 @@
 # EyeOh website
 
-The site is deliberately dependency-free static HTML and CSS. Preview it locally with:
+The site is an Astro static build prepared for Cloudflare Pages. Preview it locally with:
 
 ```bash
-python3 -m http.server 8080 --directory Website
+cd Website
+npm install
+npm run dev
 ```
 
-The download links expect a notarized release at `Website/downloads/EyeOh.zip`. The release script creates that file only after signing and notarization succeed. Do not deploy an ad-hoc signed development build as the public download.
+Build with `npm run build`; Cloudflare Pages should publish `Website/dist`. Set `PUBLIC_DOWNLOAD_URL=/downloads/EyeOh.zip` only after a notarized release has been copied to `Website/public/downloads/EyeOh.zip`. Without that variable the site truthfully shows a coming-soon state.
+
+The release script creates the public download only after signing and notarization succeed. Do not deploy an ad-hoc signed development build.
