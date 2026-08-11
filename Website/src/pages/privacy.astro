@@ -1,31 +1,50 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 ---
-<BaseLayout title="Privacy — EyeOh" description="EyeOh privacy policy and optional diagnostics details.">
+<BaseLayout title="Privacy — EyeOh" description="What the current EyeOh download stores locally, sends, and does not collect.">
   <article class="container legal-copy legal-page">
     <p class="eyebrow">Privacy</p>
-    <h1>Private first, and specific about the rest.</h1>
-    <p>Last updated 11 August 2026.</p>
-    <p>Dark Ice Interactive Pty Ltd (“Dark Ice”) is responsible for EyeOh. The app reads audio, camera and remembered Bluetooth audio-device information that macOS exposes locally and changes a preference or requests a Bluetooth reconnection only when you choose a device.</p>
+    <h1>Clear about what happens today.</h1>
+    <p class="legal-updated">Last updated 11 August 2026 for EyeOh 0.4.0.</p>
 
-    <h2>Core app data stays on your Mac</h2>
-    <p>EyeOh does not record microphone audio or camera video, create an account, read contacts, display advertising, or sell data. Camera access is requested only when you explicitly open the local live preview; the capture session stops when the window closes. Bluetooth access is requested only when you ask EyeOh to reconnect a remembered paired audio device. EyeOh does not pair new devices or connect them automatically. Device names, macOS and Bluetooth device identifiers, remembered routes, and per-device volume presets remain on your Mac.</p>
+    <div class="legal-callout legal-callout-positive">
+      <strong>The current public build sends no EyeOh diagnostics.</strong>
+      <p>EyeOh 0.4.0 was packaged without a PostHog project token, PostHog host, or Sentry DSN. Its statistics and crash-reporting controls are unavailable, so no EyeOh analytics or crash reports leave your Mac.</p>
+    </div>
 
-    <h2>Optional product statistics</h2>
-    <p>“Share private usage statistics” is off by default. If you turn it on, EyeOh sends one of six fixed events—app launched, input changed, output changed, camera changed, preview opened, or feedback opened—to PostHog’s EU service. Each event includes a random installation identifier, EyeOh version and build, distribution channel, and schema version. EyeOh disables IP geolocation and does not create a PostHog person profile.</p>
-    <p>These events never contain device or camera names, hardware identifiers, volume levels, audio, video, screenshots, email content, or free text. The identifier is pseudonymous: it recognises an installation over time but is not connected to an EyeOh account or your contact details.</p>
+    <figure class="legal-figure">
+      <picture>
+        <source srcset="/assets/eyeoh-privacy-settings.webp" type="image/webp" />
+        <img src="/assets/eyeoh-privacy-settings.png" width="688" height="696" loading="lazy" alt="EyeOh Privacy settings stating that no statistics or crash-reporting service is connected" />
+      </picture>
+      <figcaption>The shipping app reports its provider state directly in Settings.</figcaption>
+    </figure>
 
-    <h2>Optional crash reporting</h2>
-    <p>“Share crash reports” is also off by default and independent of statistics. If enabled, Sentry’s EU service receives native crash and app-hang diagnostics, including stack traces, EyeOh version, macOS version, and technical system context needed to diagnose the failure. EyeOh disables performance tracing, session tracking, network and UI breadcrumbs, logs, screenshots, attachments, memory introspection, and default personal information. It does not assign the analytics identifier to Sentry.</p>
+    <h2>Who provides EyeOh</h2>
+    <p>Dark Ice Interactive Pty Ltd (“Dark Ice”) provides the official EyeOh website and signed downloads.</p>
 
-    <h2>Choice, retention and deletion</h2>
-    <p>You can withdraw either choice at any time in EyeOh → Settings → Privacy. Disabling statistics immediately cancels its analytics session. Disabling crash reporting uninstalls Sentry and removes its local cache. It does not retract data already received.</p>
-    <p>Dark Ice will configure product-event retention to 12 months or less. Sentry’s Developer plan currently provides a 30-day lookback. You may request deletion or ask a privacy question at <a href="mailto:darkice@darkice.co?subject=EyeOh%20privacy">darkice@darkice.co</a>. Because EyeOh has no account and the analytics identifier is not linked to a name or email, use the Copy button beside Analytics ID in EyeOh Settings when a specific-event search is required.</p>
+    <h2>Information that stays on your Mac</h2>
+    <p>EyeOh reads the audio routes and cameras that macOS exposes locally so it can display and change your chosen preference. It stores these items in local app preferences:</p>
+    <ul>
+      <li>the display name, Core Audio route and Bluetooth address of a paired Bluetooth audio device EyeOh has already seen;</li>
+      <li>separate volume presets for capable input and output devices;</li>
+      <li>whether to launch at login and whether disconnected Bluetooth shortcuts should remain visible; and</li>
+      <li>the state of the currently unavailable diagnostics choices.</li>
+    </ul>
+    <p>EyeOh does not upload device names, hardware identifiers, Bluetooth addresses, volume values, camera choices, or these local preferences.</p>
 
-    <h2>Processors and safeguards</h2>
-    <p>PostHog and Sentry act as service providers for the optional purposes described above. Official EyeOh builds accept only their EU ingestion endpoints. Dark Ice does not use this information for advertising or tracking across other companies’ apps or websites, and does not enable third-party AI analysis for this project.</p>
+    <h2>Microphone, camera and Bluetooth access</h2>
+    <p>EyeOh never captures microphone samples and does not request microphone-recording permission. Camera access is requested only when you explicitly open the local preview; its capture session stops when the preview closes, and EyeOh does not record, save, analyse, or transmit frames.</p>
+    <p>Bluetooth access is used only after you click a remembered disconnected audio device. EyeOh asks macOS to reconnect that already-paired device. It does not scan for arbitrary nearby accessories, pair new devices, or connect them automatically.</p>
 
-    <h2>Website</h2>
-    <p>The EyeOh website is statically hosted on Cloudflare. It does not currently set analytics or advertising cookies. Cloudflare may process ordinary request and security logs as part of hosting the site under its own terms.</p>
+    <h2>Diagnostics code that is not active today</h2>
+    <p>The open-source project contains consent-gated support for limited product statistics through PostHog and native crash or hang reporting through Sentry. Those paths require release-time provider configuration that is absent from EyeOh 0.4.0. Disabled code is not collection.</p>
+    <p>Dark Ice will update this policy and complete provider-side privacy, retention, abuse-prevention, receipt and deletion checks before distributing any build with either service connected. A configured build must continue to show separate controls and must not send device names, recordings, screenshots, contact details, email content, or free text.</p>
+
+    <h2>Website hosting</h2>
+    <p>The EyeOh website is statically hosted on Cloudflare. It does not run EyeOh analytics, set advertising cookies, or use behavioural tracking. Its light/dark control stores only your chosen colour theme in local browser storage. Cloudflare may process ordinary request, security, and delivery logs as part of operating the hosting service under its own terms.</p>
+
+    <h2>Questions and requests</h2>
+    <p>Because the current app sends no EyeOh diagnostics and has no account, Dark Ice holds no app analytics record to look up for this release. For a privacy question, email <a href="mailto:darkice@darkice.co?subject=EyeOh%20privacy">darkice@darkice.co</a>.</p>
   </article>
 </BaseLayout>

@@ -5,10 +5,12 @@ import '../../styles.css';
 interface Props {
   title: string;
   description: string;
+  image?: string;
 }
 
-const { title, description } = Astro.props;
+const { title, description, image = '/assets/eyeoh-menu-main.png' } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site);
+const socialImage = new URL(image, Astro.site);
 const downloadURL = import.meta.env.PUBLIC_DOWNLOAD_URL;
 ---
 <!doctype html>
@@ -17,10 +19,17 @@ const downloadURL = import.meta.env.PUBLIC_DOWNLOAD_URL;
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width" />
     <meta name="description" content={description} />
-    <meta name="theme-color" content="#f8fafc" media="(prefers-color-scheme: light)" />
-    <meta name="theme-color" content="#0a1218" media="(prefers-color-scheme: dark)" />
+    <meta id="theme-colour" name="theme-color" content="#f5f8fa" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="EyeOh" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={socialImage} />
+    <meta name="twitter:card" content="summary_large_image" />
     <link rel="canonical" href={canonical} />
     <link rel="icon" href={logo.src} type="image/svg+xml" />
+    <script is:inline src="/theme.js"></script>
     <title>{title}</title>
   </head>
   <body>
@@ -33,8 +42,17 @@ const downloadURL = import.meta.env.PUBLIC_DOWNLOAD_URL;
         </a>
         <nav aria-label="Main navigation">
           <a href="/#features">Features</a>
+          <a href="/#why">Why EyeOh</a>
           <a href="/#faq">FAQ</a>
           <a href="/support/">Support</a>
+          <div class="theme-control" role="group" aria-label="Colour theme">
+            <button type="button" data-theme-choice="light" aria-label="Use light theme" aria-pressed="false">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.5"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg>
+            </button>
+            <button type="button" data-theme-choice="dark" aria-label="Use dark theme" aria-pressed="false">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 15.2A8.6 8.6 0 0 1 8.8 4a8.6 8.6 0 1 0 11.2 11.2Z"></path></svg>
+            </button>
+          </div>
           {downloadURL ? (
             <a class="button button-small" href={downloadURL}>Download · Free</a>
           ) : (
@@ -50,10 +68,11 @@ const downloadURL = import.meta.env.PUBLIC_DOWNLOAD_URL;
           <img src={logo.src} width="28" height="28" alt="" />
           <span class="brand-lockup"><strong>EyeOh</strong><small>by Dark Ice</small></span>
         </a>
-        <p>Built by Dark Ice Interactive. No account. Optional diagnostics stay off until you choose otherwise.</p>
+        <p>Built by Dark Ice Interactive. No account. The current download sends no EyeOh diagnostics.</p>
         <div class="footer-links">
           <a href="/support/">Support</a>
           <a href="/privacy/">Privacy</a>
+          <a href="/terms/">Terms</a>
           <a href="https://darkice.au/">darkice.au</a>
         </div>
       </div>

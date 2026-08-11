@@ -46,6 +46,27 @@ Primary sources:
 - [Apple user-preferred camera API](https://developer.apple.com/documentation/avfoundation/avcapturedevice/userpreferredcamera)
 - [Apple camera sandbox entitlement](https://developer.apple.com/documentation/bundleresources/entitlements/com.apple.security.device.camera)
 
+## Direct download and Mac App Store together
+
+Apple supports both macOS distribution models: Developer ID plus notarization for software distributed by its developer, and App Store distribution for a sandboxed build. EyeOh can therefore keep the notarized website download after a Mac App Store edition launches; there is no Mac App Store exclusivity requirement in the reviewed rules.
+
+Maintain two release configurations from the same source tree:
+
+- **Direct:** Developer ID signed, Hardened Runtime, notarized and stapled. Dark Ice owns download hosting and updates and may later use its own direct-edition licensing.
+- **Mac App Store:** Apple Distribution signing and provisioning, App Sandbox, only the capabilities used by that submitted build, and updates only through the Mac App Store. Digital feature unlocks inside this edition must follow StoreKit/In-App Purchase rules; do not add a Dark Ice licence screen or key system to the MAS binary.
+
+Using the existing `au.com.darkice.eyeoh` bundle identifier for both configurations is the simplest product choice when installing one channel should replace the other. This is a product recommendation rather than an Apple requirement. Use separate identifiers only if side-by-side installation is genuinely needed, because that creates separate preferences, sandbox containers, receipts, and migration work. The App Store record's bundle identifier becomes fixed after a build is uploaded.
+
+The two editions may differ where sandbox or review rules require it. Compile direct-only functionality out of the MAS target, clearly compare editions on the website, and ensure MAS screenshots and metadata advertise only functionality present in the reviewed binary. The current free core has no payment conflict.
+
+Primary sources:
+
+- [Apple macOS distribution comparison](https://developer.apple.com/macos/distribution/)
+- [Apple Developer ID](https://developer.apple.com/support/developer-id/)
+- [Apple App Sandbox configuration](https://developer.apple.com/documentation/xcode/configuring-the-macos-app-sandbox)
+- [Apple App Review Guidelines](https://developer.apple.com/app-store/review/guidelines/)
+- [Apple App Store marketing guidelines](https://developer.apple.com/app-store/marketing/guidelines/)
+
 ## Camera assessment
 
 The supported camera feature is a preference, not a forced global route. EyeOh sets `AVCaptureDevice.userPreferredCamera`; apps that adopt Apple's `systemPreferredCamera` behaviour can follow it, while Teams, Zoom, browsers, and other apps may retain a camera explicitly selected in their own settings.

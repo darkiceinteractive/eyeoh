@@ -6,88 +6,205 @@ const downloadURL = import.meta.env.PUBLIC_DOWNLOAD_URL;
 const zipDownloadURL = import.meta.env.PUBLIC_ZIP_DOWNLOAD_URL;
 ---
 <BaseLayout
-  title="EyeOh by Dark Ice — Mac audio and camera switching"
-  description="EyeOh is a free native macOS menu-bar app for switching microphones and speakers and choosing a preferred camera in one click."
+  title="EyeOh — Switch Mac audio and cameras in one click"
+  description="EyeOh is a free native macOS menu-bar app for switching microphones, speakers and preferred cameras, reconnecting Bluetooth audio, and remembering device volumes."
+  image="/assets/eyeoh-menu-main.png"
 >
   <section class="hero" id="top">
     <div class="container hero-grid">
       <div class="hero-copy">
-        <p class="eyebrow">A free Dark Ice utility for macOS</p>
-        <h1>Your Mac’s I/O, one click away.</h1>
-        <p class="lede">Switch microphones and speakers, restore the right volume, and choose your preferred camera from one quiet menu.</p>
-        <p class="route-note">EyeOh changes macOS audio defaults and camera preference. Apps pinned to a named device can still keep their own selection.</p>
+        <p class="eyebrow">Fast I/O switching for macOS</p>
+        <h1>The right mic, speaker and camera. One click.</h1>
+        <p class="lede">EyeOh keeps the choices you reach for every day in one quiet menu—including Bluetooth devices that are not connected yet.</p>
         <div class="hero-actions">
           {downloadURL ? (
-            <a class="button button-primary" href={downloadURL}>Download EyeOh — Free</a>
+            <a class="button button-primary" href={downloadURL}>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m0 0 5-5m-5 5-5-5M5 21h14"></path></svg>
+              Download EyeOh — Free
+            </a>
           ) : (
             <span class="button button-primary" aria-disabled="true">Download coming soon — Free</span>
           )}
-          <a class="text-link" href="#install">How to install <span aria-hidden="true">→</span></a>
+          <a class="text-link" href="#why">See how it saves time <span aria-hidden="true">→</span></a>
         </div>
-        <p class="release-meta">Version 0.4.0 · macOS 14 or later · Apple Silicon and Intel</p>
+        <div class="proof-list" aria-label="EyeOh release details">
+          <span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4 4L19 6"></path></svg>Free</span>
+          <span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 5 6v5c0 4.8 2.9 8.2 7 10 4.1-1.8 7-5.2 7-10V6l-7-3Z"></path></svg>Notarized</span>
+          <span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M7 4v6m10-6v6M5 13h5v7H5zM14 13h5v7h-5z"></path></svg>Apple Silicon + Intel</span>
+        </div>
+        <p class="release-meta">Version 0.4.0 · macOS 14 or later · no account or driver</p>
       </div>
-      <div class="product-stage">
+
+      <figure class="hero-visual">
         <div class="ambient" aria-hidden="true"></div>
-        <img
-          class="product-screenshot"
-          src="/assets/eyeoh-menu-iphone.png"
-          width="363"
-          height="602"
-          alt="EyeOh menu showing selected audio routes alongside an iPhone microphone, iPhone camera and Desk View camera"
-        />
-      </div>
+        <picture>
+          <source srcset="/assets/eyeoh-menu-main.webp" type="image/webp" />
+          <img src="/assets/eyeoh-menu-main.png" width="334" height="558" alt="EyeOh menu showing Mac microphones, speakers, cameras and volume controls" fetchpriority="high" />
+        </picture>
+        <figcaption><span aria-hidden="true"></span>Live system routes, always in reach</figcaption>
+      </figure>
     </div>
   </section>
 
   <section class="features section" id="features" aria-labelledby="features-title">
     <div class="container">
-      <p class="eyebrow">One menu. Every meeting route.</p>
-      <h2 id="features-title">The choices you change every day, without the trip through Settings.</h2>
-      <div class="feature-grid">
-        <article><span class="feature-icon" aria-hidden="true">↳</span><h3>Input, instantly</h3><p>Move between built-in, USB, Bluetooth, and useful virtual microphones with a click.</p></article>
-        <article><span class="feature-icon" aria-hidden="true">↗</span><h3>Output, too</h3><p>Send apps and system sounds to speakers, displays, audio interfaces, or headphones.</p></article>
-        <article><span class="feature-icon" aria-hidden="true">⌁</span><h3>Reconnect, then route</h3><p>Keep a previously used Bluetooth audio device within reach, even while it is disconnected.</p></article>
-        <article><span class="feature-icon" aria-hidden="true">≋</span><h3>Your levels, remembered</h3><p>EyeOh restores a preferred input gain or output volume for each capable device.</p></article>
-        <article><span class="feature-icon" aria-hidden="true">▣</span><h3>See the angle first</h3><p>Choose a preferred camera and open a private live preview only when you want it.</p></article>
+      <div class="section-heading">
+        <p class="eyebrow">Less hunting. More doing.</p>
+        <h2 id="features-title">The everyday detours, removed.</h2>
+        <p>EyeOh stays focused on one job: making your Mac’s inputs and outputs quick to see, reconnect and switch.</p>
       </div>
+      <div class="feature-grid">
+        <article>
+          <span class="feature-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 12h12m0 0-4-4m4 4-4 4M4 6h4M4 18h4"></path></svg></span>
+          <h3>Switch in one click</h3>
+          <p>Choose a microphone, speaker or preferred camera without opening System Settings.</p>
+        </article>
+        <article>
+          <span class="feature-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 8a7 7 0 0 1 12 0M9 11a3.5 3.5 0 0 1 6 0M12 14v7M5 18h14"></path></svg></span>
+          <h3>Reconnect Bluetooth</h3>
+          <p>A previously used headset can stay in the menu while disconnected. Click Connect and carry on.</p>
+        </article>
+        <article>
+          <span class="feature-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12h2m3-4v8m3-11v14m3-9v4m3-7v10"></path></svg></span>
+          <h3>Remember each level</h3>
+          <p>EyeOh stores separate input and output volumes for devices macOS lets software control.</p>
+        </article>
+        <article>
+          <span class="feature-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="14" height="12" rx="2"></rect><path d="m17 10 4-2v8l-4-2M8 10h4"></path></svg></span>
+          <h3>Check the angle</h3>
+          <p>Pick a built-in, external, Desk View or Continuity camera and open preview only when needed.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="stories section" id="why" aria-labelledby="why-title">
+    <div class="container">
+      <div class="section-heading section-heading-centred">
+        <p class="eyebrow">Small moments, made easier</p>
+        <h2 id="why-title">From “where did it go?” to ready.</h2>
+        <p>Real screenshots from EyeOh 0.4. No mock controls and no carefully renamed demo devices.</p>
+      </div>
+
+      <article class="story story-featured">
+        <div class="story-copy">
+          <p class="story-kicker">Bluetooth reconnect</p>
+          <h3>Your headphones can be off without disappearing.</h3>
+          <p>Once EyeOh has seen a paired Bluetooth audio device, it keeps a dimmed shortcut under Input and Output. Turn the device on, click <strong>Connect</strong>, and EyeOh asks macOS to reconnect and select only the route you chose.</p>
+          <ul class="check-list">
+            <li>Nothing connects automatically</li>
+            <li>EyeOh never pairs unknown devices</li>
+            <li>Hide or clear remembered shortcuts anytime</li>
+          </ul>
+        </div>
+        <figure class="story-shot story-shot-menu">
+          <picture>
+            <source srcset="/assets/eyeoh-bluetooth-reconnect.webp" type="image/webp" />
+            <img src="/assets/eyeoh-bluetooth-reconnect.png" width="334" height="558" loading="lazy" alt="EyeOh showing disconnected Onyx Star Connect shortcuts under Input and Output" />
+          </picture>
+          <figcaption>Disconnected, but still one click away.</figcaption>
+        </figure>
+      </article>
+
+      <article class="story story-reverse">
+        <div class="story-copy">
+          <p class="story-kicker">Per-device volume</p>
+          <h3>Your quiet mic stays quiet. Your speakers stay useful.</h3>
+          <p>Set a level once and EyeOh remembers it for that device and direction. The next time you switch back, your preset comes with you.</p>
+          <p class="story-note">Hardware-controlled devices remain honest: EyeOh tells you when macOS cannot change their level.</p>
+        </div>
+        <figure class="story-shot story-shot-wide">
+          <picture>
+            <source srcset="/assets/eyeoh-volume-presets.webp" type="image/webp" />
+            <img src="/assets/eyeoh-volume-presets.png" width="552" height="665" loading="lazy" alt="EyeOh input-volume menu with quieter, louder and percentage presets" />
+          </picture>
+          <figcaption>Useful controls, remembered for the selected device.</figcaption>
+        </figure>
+      </article>
+
+      <article class="story">
+        <div class="story-copy">
+          <p class="story-kicker">Audio and video together</p>
+          <h3>The route you need is visible before the meeting starts.</h3>
+          <p>USB mic, Bluetooth speaker, built-in camera, iPhone Continuity Camera and Desk View all sit in one compact menu. The blue label and lime check make the current choice unmistakable.</p>
+          <p class="story-note">Apps pinned to a named device can still keep their own selection; set them to Default or System to follow EyeOh.</p>
+        </div>
+        <figure class="story-shot story-shot-menu">
+          <picture>
+            <source srcset="/assets/eyeoh-menu-iphone.webp" type="image/webp" />
+            <img src="/assets/eyeoh-menu-iphone.png" width="363" height="602" loading="lazy" alt="EyeOh menu showing selected audio routes and available iPhone camera options" />
+          </picture>
+          <figcaption>One view of the Mac’s everyday I/O.</figcaption>
+        </figure>
+      </article>
+
+      <article class="story story-reverse story-settings">
+        <div class="story-copy">
+          <p class="story-kicker">Quietly configurable</p>
+          <h3>The menu stays small. The controls stay close.</h3>
+          <p>Launch at login, device refresh, Sound and Bluetooth Settings, and remembered-device cleanup live in Settings—not in the menu you use all day.</p>
+        </div>
+        <figure class="story-shot story-shot-window">
+          <picture>
+            <source srcset="/assets/eyeoh-settings.webp" type="image/webp" />
+            <img src="/assets/eyeoh-settings.png" width="688" height="696" loading="lazy" alt="EyeOh General settings showing launch at login and Bluetooth shortcut controls" />
+          </picture>
+          <figcaption>Less-used controls are available without becoming clutter.</figcaption>
+        </figure>
+      </article>
     </div>
   </section>
 
   <section class="how section" id="install" aria-labelledby="install-title">
     <div class="container split-panel">
-      <div><p class="eyebrow">Up and running</p><h2 id="install-title">Three small steps.</h2><p>EyeOh lives in the menu bar, with no Dock icon, driver, account, or background helper.</p></div>
+      <div>
+        <p class="eyebrow">Up and running</p>
+        <h2 id="install-title">Install it once. Reach it anytime.</h2>
+        <p>EyeOh lives in the menu bar, with no Dock icon, driver, account, or background helper.</p>
+      </div>
       <ol class="steps">
-        <li><span>1</span><div><strong>Download</strong><p>Open the DMG and drag EyeOh into Applications.{zipDownloadURL ? <> Prefer an archive? <a href={zipDownloadURL}>Download the ZIP</a>.</> : null}</p></div></li>
-        <li><span>2</span><div><strong>Open</strong><p>Launch EyeOh from Applications. Its route symbol appears in the menu bar.</p></div></li>
-        <li><span>3</span><div><strong>Choose</strong><p>Pick an input, output, or preferred camera. Preview only when needed.</p></div></li>
+        <li><span>1</span><div><strong>Download</strong><p>Open the notarized DMG and drag EyeOh into Applications.{zipDownloadURL ? <> Prefer an archive? <a href={zipDownloadURL}>Download the ZIP</a>.</> : null}</p></div></li>
+        <li><span>2</span><div><strong>Open</strong><p>Launch EyeOh from Applications. Its compact route symbol appears in the menu bar.</p></div></li>
+        <li><span>3</span><div><strong>Choose</strong><p>Click the input, output or preferred camera you want. That is the whole workflow.</p></div></li>
       </ol>
     </div>
   </section>
 
   <section class="privacy section" aria-labelledby="privacy-title">
     <div class="container privacy-panel">
-      <div class="privacy-mark" aria-hidden="true">✓</div>
-      <div><p class="eyebrow">Private by default</p><h2 id="privacy-title">EyeOh never listens or records.</h2><p>Device choices and volume presets stay on your Mac. Camera access is used only for a preview you explicitly open. Optional product statistics and crash reporting are separate, off by default, minimised, and can be withdrawn at any time.</p><p><a href="/privacy/">Read exactly what can be sent →</a></p></div>
+      <div class="privacy-mark" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3 5 6v5c0 4.8 2.9 8.2 7 10 4.1-1.8 7-5.2 7-10V6l-7-3Z"></path><path d="m9 12 2 2 4-4"></path></svg></div>
+      <div>
+        <p class="eyebrow">The current download sends nothing</p>
+        <h2 id="privacy-title">No recording. No EyeOh analytics. No crash uploads.</h2>
+        <p>EyeOh 0.4 stores device choices, remembered Bluetooth shortcuts and volume presets on your Mac. Camera access is used only while a preview you opened is visible. The shipping build has no PostHog or Sentry service connected, so both reporting controls are unavailable and no EyeOh diagnostics leave your Mac.</p>
+        <p><a href="/privacy/">Read the current-data statement and future diagnostics boundary →</a></p>
+      </div>
     </div>
   </section>
 
   <section class="faq section" id="faq" aria-labelledby="faq-title">
     <div class="container faq-wrap">
-      <div><p class="eyebrow">Good to know</p><h2 id="faq-title">Questions, answered.</h2></div>
+      <div><p class="eyebrow">Good to know</p><h2 id="faq-title">Short answers before the first click.</h2></div>
       <div class="faq-list">
-        <details><summary>Why didn’t Teams or Zoom change devices?</summary><p>Meeting apps can be pinned to a named device. Choose “Default” or “System” in that app so it follows EyeOh.</p></details>
+        <details><summary>Why didn’t Teams or Zoom change devices?</summary><p>Meeting apps can be pinned to a named device. Choose Default or System in that app so it follows EyeOh.</p></details>
         <details><summary>Why didn’t macOS Voice Control change microphones?</summary><p>Voice Control has its own microphone choice under System Settings → Accessibility → Voice Control. Apple does not provide apps with a supported way to change that separate selection, so choose the same microphone there or use Automatic.</p></details>
         <details><summary>Does EyeOh need microphone permission?</summary><p>No. It changes device settings but never captures microphone audio.</p></details>
-        <details><summary>Why does camera preview need permission?</summary><p>macOS requires permission to show a live view. EyeOh asks only when you open Preview and stops when you close it.</p></details>
-        <details><summary>How does Bluetooth reconnect work?</summary><p>After EyeOh has seen a paired Bluetooth audio device, it can keep a dimmed shortcut while that device is disconnected. Click it to ask macOS to reconnect, select the route and restore its saved volume. EyeOh does not pair or automatically connect unknown devices, and you can hide or clear remembered shortcuts in Settings.</p></details>
-        <details><summary>Can I use my iPhone camera?</summary><p>Yes. An eligible nearby iPhone made available by Apple Continuity Camera appears automatically.</p></details>
-        <details><summary>What do the privacy switches send?</summary><p>Nothing while off. Statistics are six fixed feature events; crash reporting is technical crash/hang data. Neither includes device names, recordings, screenshots, or contact details.</p></details>
+        <details><summary>How does Bluetooth reconnect work?</summary><p>After EyeOh has seen a paired Bluetooth audio device, it keeps a dimmed shortcut while that route is disconnected. Clicking it asks macOS to reconnect. EyeOh does not scan for, pair or automatically connect unknown devices.</p></details>
+        <details><summary>Can I use my iPhone camera?</summary><p>Yes. An eligible nearby iPhone made available by Apple Continuity Camera appears automatically. Camera preview needs permission only while its window is open.</p></details>
+        <details><summary>What diagnostics are collected today?</summary><p>None by EyeOh 0.4. PostHog and Sentry support exists in the source, but the current public build contains no provider configuration. The Settings switches are disabled and no EyeOh analytics or crash reports are sent.</p></details>
+        <details><summary>Will EyeOh be on the Mac App Store?</summary><p>The direct notarized download is available now. A sandboxed Mac App Store edition is planned; macOS permits both channels, and each will be clearly labelled if their capabilities differ.</p></details>
         <details><summary>Is EyeOh open source?</summary><p>Yes. EyeOh Core is MIT-licensed. Official Dark Ice names and artwork are protected separately.</p></details>
       </div>
     </div>
   </section>
 
   <section class="final-cta section" aria-labelledby="download-title">
-    <div class="container final-panel"><img src={logo.src} width="72" height="72" alt="" /><h2 id="download-title">Audio and video routes, finally within reach.</h2><p>Small, native, private by default, and free.</p>{downloadURL ? <a class="button button-primary" href={downloadURL}>Download EyeOh — Free</a> : <span class="button button-primary" aria-disabled="true">Release coming soon</span>}</div>
+    <div class="container final-panel">
+      <img src={logo.src} width="72" height="72" alt="" />
+      <p class="eyebrow">One useful little menu</p>
+      <h2 id="download-title">Stop digging through Settings.</h2>
+      <p>EyeOh is native, notarized, free, and focused on the switches that interrupt your day.</p>
+      {downloadURL ? <a class="button button-primary" href={downloadURL}>Download EyeOh — Free</a> : <span class="button button-primary" aria-disabled="true">Release coming soon</span>}
+    </div>
   </section>
 </BaseLayout>

@@ -46,7 +46,7 @@ The ad-hoc signed app bundle is created at `build/EyeOh.app` and launched automa
 
 ## Release preparation
 
-See `RELEASE_READINESS.md` for the current Mac App Store, Setapp, and free direct-download assessment, `APP_REVIEW_NOTES.md` for capability justification and reviewer steps, and `RELEASING.md` for the public-source/private-release security boundary. To create a universal Developer ID-signed release candidate without submitting it for notarization:
+See `RELEASE_READINESS.md` for the current Mac App Store, dual-distribution, Setapp, and free direct-download assessment, `APP_REVIEW_NOTES.md` for capability justification and reviewer steps, and `RELEASING.md` for the public-source/private-release security boundary. To create a universal Developer ID-signed release candidate without submitting it for notarization:
 
 ```bash
 APP_IDENTITY="Developer ID Application: Your Company (TEAMID)" ./Scripts/release_direct.sh
@@ -56,7 +56,7 @@ The public website lives in `Website/`. Its primary DMG and fallback ZIP downloa
 
 ## Privacy and diagnostics
 
-Usage statistics and crash reporting are separate and off by default. Official release builds can inject reporting configuration at packaging time; source builds without those values remain offline. PostHog receives only six fixed feature events under a random installation identifier. Sentry is configured for crashes and hangs only. Neither path includes device names, recordings, screenshots, contact details or free text. See `TELEMETRY.md` for the exact schema and release validation gate.
+Usage statistics and crash reporting are separate and off by default. Official release builds can inject reporting configuration at packaging time; source builds without those values remain offline. The public EyeOh 0.4.0 build was released without a PostHog token/host or Sentry DSN, so both controls are unavailable and it sends no EyeOh analytics or crash reports. A future configured build may use only the six fixed product events and restricted crash/hang boundary documented in `TELEMETRY.md`; neither path may include device names, recordings, screenshots, contact details or free text.
 
 PostHog uses a small first-party HTTPS reporter rather than its general mobile SDK, eliminating autocapture, replay, feature flags and person profiles from the binary. Sentry is the only diagnostic SDK because native crash capture requires it. The in-app feedback action never attaches a recording or device list.
 
