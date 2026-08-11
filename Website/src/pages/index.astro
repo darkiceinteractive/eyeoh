@@ -2,7 +2,7 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import logo from '../../assets/eyeoh-mark.svg';
 
-const downloadURL = import.meta.env.PUBLIC_DOWNLOAD_URL;
+const downloadURL = import.meta.env.PUBLIC_DOWNLOAD_URL ?? '/downloads/EyeOh.dmg';
 const zipDownloadURL = import.meta.env.PUBLIC_ZIP_DOWNLOAD_URL;
 ---
 <BaseLayout
@@ -17,14 +17,10 @@ const zipDownloadURL = import.meta.env.PUBLIC_ZIP_DOWNLOAD_URL;
         <h1>The right mic, speaker and camera. One click.</h1>
         <p class="lede">EyeOh keeps the choices you reach for every day in one quiet menu—including Bluetooth devices that are not connected yet.</p>
         <div class="hero-actions">
-          {downloadURL ? (
-            <a class="button button-primary" href={downloadURL}>
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m0 0 5-5m-5 5-5-5M5 21h14"></path></svg>
-              Download EyeOh — Free
-            </a>
-          ) : (
-            <span class="button button-primary" aria-disabled="true">Download coming soon — Free</span>
-          )}
+          <a class="button button-primary" href={downloadURL} data-download>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m0 0 5-5m-5 5-5-5M5 21h14"></path></svg>
+            Download EyeOh — Free
+          </a>
           <a class="text-link" href="#why">See how it saves time <span aria-hidden="true">→</span></a>
         </div>
         <div class="proof-list" aria-label="EyeOh release details">
@@ -174,9 +170,9 @@ const zipDownloadURL = import.meta.env.PUBLIC_ZIP_DOWNLOAD_URL;
     <div class="container privacy-panel">
       <div class="privacy-mark" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3 5 6v5c0 4.8 2.9 8.2 7 10 4.1-1.8 7-5.2 7-10V6l-7-3Z"></path><path d="m9 12 2 2 4-4"></path></svg></div>
       <div>
-        <p class="eyebrow">The current download sends nothing</p>
-        <h2 id="privacy-title">No recording. No EyeOh analytics. No crash uploads.</h2>
-        <p>EyeOh 0.4 stores device choices, remembered Bluetooth shortcuts and volume presets on your Mac. Camera access is used only while a preview you opened is visible. The shipping build has no PostHog or Sentry service connected, so both reporting controls are unavailable and no EyeOh diagnostics leave your Mac.</p>
+        <p class="eyebrow">The app sends nothing</p>
+        <h2 id="privacy-title">No recording. No in-app analytics. No crash uploads.</h2>
+        <p>EyeOh 0.4 stores device choices, remembered Bluetooth shortcuts and volume presets on your Mac. Camera access is used only while a preview you opened is visible. The shipping build has no PostHog or Sentry service connected, so both reporting controls are unavailable and no EyeOh diagnostics leave your Mac. The website counts aggregate download-button intent without cookies or a visitor identifier.</p>
         <p><a href="/privacy/">Read the current-data statement and future diagnostics boundary →</a></p>
       </div>
     </div>
@@ -204,7 +200,7 @@ const zipDownloadURL = import.meta.env.PUBLIC_ZIP_DOWNLOAD_URL;
       <p class="eyebrow">One useful little menu</p>
       <h2 id="download-title">Stop digging through Settings.</h2>
       <p>EyeOh is native, notarized, free, and focused on the switches that interrupt your day.</p>
-      {downloadURL ? <a class="button button-primary" href={downloadURL}>Download EyeOh — Free</a> : <span class="button button-primary" aria-disabled="true">Release coming soon</span>}
+      <a class="button button-primary" href={downloadURL} data-download>Download EyeOh — Free</a>
     </div>
   </section>
 </BaseLayout>

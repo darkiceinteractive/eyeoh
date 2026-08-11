@@ -11,7 +11,7 @@ interface Props {
 const { title, description, image = '/assets/eyeoh-menu-main.png' } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 const socialImage = new URL(image, Astro.site);
-const downloadURL = import.meta.env.PUBLIC_DOWNLOAD_URL;
+const downloadURL = import.meta.env.PUBLIC_DOWNLOAD_URL ?? '/downloads/EyeOh.dmg';
 ---
 <!doctype html>
 <html lang="en-AU">
@@ -30,6 +30,7 @@ const downloadURL = import.meta.env.PUBLIC_DOWNLOAD_URL;
     <link rel="canonical" href={canonical} />
     <link rel="icon" href={logo.src} type="image/svg+xml" />
     <script is:inline src="/theme.js"></script>
+    <script is:inline src="/download-analytics.js" defer></script>
     <title>{title}</title>
   </head>
   <body>
@@ -53,11 +54,7 @@ const downloadURL = import.meta.env.PUBLIC_DOWNLOAD_URL;
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 15.2A8.6 8.6 0 0 1 8.8 4a8.6 8.6 0 1 0 11.2 11.2Z"></path></svg>
             </button>
           </div>
-          {downloadURL ? (
-            <a class="button button-small" href={downloadURL}>Download · Free</a>
-          ) : (
-            <span class="button button-small" aria-disabled="true">Free · Coming soon</span>
-          )}
+          <a class="button button-small" href={downloadURL} data-download>Download · Free</a>
         </nav>
       </div>
     </header>

@@ -27,7 +27,7 @@ Common properties are `schema_version`, `app_version`, `app_build`, `distributio
 
 Explicitly prohibited: device and camera names, Core Audio or AVFoundation identifiers, volume values, audio, video, screenshots, window titles, URLs, email content, contact details, IP-derived location, advertising identifiers, cross-app identifiers, and free text.
 
-There is no app-level purchase or signup conversion. The later website funnel should be measured separately as `download_started` → confirmed first `app_launched`, without joining website visitors to app installations.
+There is no app-level purchase or signup conversion. The website separately counts aggregate `download_clicked` intent through an empty first-party POST to a dedicated Cloudflare Pages Function. It does not identify the visitor or join a website click to an app installation. A future configured app may provide a separate aggregate `app_launched` count, but the two datasets must not be linked or presented as proof that a particular download installed successfully.
 
 ## PostHog configuration
 

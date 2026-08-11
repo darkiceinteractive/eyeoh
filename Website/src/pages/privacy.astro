@@ -41,8 +41,10 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     <p>The open-source project contains consent-gated support for limited product statistics through PostHog and native crash or hang reporting through Sentry. Those paths require release-time provider configuration that is absent from EyeOh 0.4.0. Disabled code is not collection.</p>
     <p>Dark Ice will update this policy and complete provider-side privacy, retention, abuse-prevention, receipt and deletion checks before distributing any build with either service connected. A configured build must continue to show separate controls and must not send device names, recordings, screenshots, contact details, email content, or free text.</p>
 
-    <h2>Website hosting</h2>
-    <p>The EyeOh website is statically hosted on Cloudflare. It does not run EyeOh analytics, set advertising cookies, or use behavioural tracking. Its light/dark control stores only your chosen colour theme in local browser storage. Cloudflare may process ordinary request, security, and delivery logs as part of operating the hosting service under its own terms.</p>
+    <h2>Website hosting and download measurement</h2>
+    <p>The EyeOh website is hosted on Cloudflare. When you click an EyeOh download button, the browser sends an empty first-party POST request to the site’s <code>/analytics/download</code> endpoint while continuing to the signed DMG. Cloudflare’s aggregate Pages Function metrics count successful requests to that one endpoint for up to three months.</p>
+    <p>The request contains no EyeOh analytics payload. Dark Ice does not set or write an analytics cookie, visitor or device identifier, account information, referrer, URL parameters, or free text. This count shows download-button intent; it cannot prove that the transfer, installation, or first launch completed. Cloudflare may process ordinary connection metadata as the hosting provider.</p>
+    <p>The website does not use a third-party browser analytics beacon, advertising cookies, behavioural tracking, or PostHog. Its light/dark control stores only your chosen colour theme in local browser storage. Cloudflare may separately process ordinary request, security, and delivery logs as part of operating the hosting service under its own terms.</p>
 
     <h2>Questions and requests</h2>
     <p>Because the current app sends no EyeOh diagnostics and has no account, Dark Ice holds no app analytics record to look up for this release. For a privacy question, email <a href="mailto:darkice@darkice.co?subject=EyeOh%20privacy">darkice@darkice.co</a>.</p>
