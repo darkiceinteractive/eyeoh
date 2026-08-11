@@ -4,6 +4,7 @@ import ProductMenu from '../components/ProductMenu.astro';
 import logo from '../../assets/eyeoh-mark.svg';
 
 const downloadURL = import.meta.env.PUBLIC_DOWNLOAD_URL;
+const zipDownloadURL = import.meta.env.PUBLIC_ZIP_DOWNLOAD_URL;
 ---
 <BaseLayout
   title="EyeOh by Dark Ice — Mac audio and camera switching"
@@ -47,8 +48,8 @@ const downloadURL = import.meta.env.PUBLIC_DOWNLOAD_URL;
     <div class="container split-panel">
       <div><p class="eyebrow">Up and running</p><h2 id="install-title">Three small steps.</h2><p>EyeOh lives in the menu bar, with no Dock icon, driver, account, or background helper.</p></div>
       <ol class="steps">
-        <li><span>1</span><div><strong>Download</strong><p>Open the ZIP and move EyeOh to Applications.</p></div></li>
-        <li><span>2</span><div><strong>Open</strong><p>Launch it once. EyeOh’s route symbol appears in the menu bar.</p></div></li>
+        <li><span>1</span><div><strong>Download</strong><p>Open the DMG and drag EyeOh into Applications.{zipDownloadURL ? <> Prefer an archive? <a href={zipDownloadURL}>Download the ZIP</a>.</> : null}</p></div></li>
+        <li><span>2</span><div><strong>Open</strong><p>Launch EyeOh from Applications. Its route symbol appears in the menu bar.</p></div></li>
         <li><span>3</span><div><strong>Choose</strong><p>Pick an input, output, or preferred camera. Preview only when needed.</p></div></li>
       </ol>
     </div>
@@ -66,6 +67,7 @@ const downloadURL = import.meta.env.PUBLIC_DOWNLOAD_URL;
       <div><p class="eyebrow">Good to know</p><h2 id="faq-title">Questions, answered.</h2></div>
       <div class="faq-list">
         <details><summary>Why didn’t Teams or Zoom change devices?</summary><p>Meeting apps can be pinned to a named device. Choose “Default” or “System” in that app so it follows EyeOh.</p></details>
+        <details><summary>Why didn’t macOS Voice Control change microphones?</summary><p>Voice Control has its own microphone choice under System Settings → Accessibility → Voice Control. Apple does not provide apps with a supported way to change that separate selection, so choose the same microphone there or use Automatic.</p></details>
         <details><summary>Does EyeOh need microphone permission?</summary><p>No. It changes device settings but never captures microphone audio.</p></details>
         <details><summary>Why does camera preview need permission?</summary><p>macOS requires permission to show a live view. EyeOh asks only when you open Preview and stops when you close it.</p></details>
         <details><summary>Can I use my iPhone camera?</summary><p>Yes. An eligible nearby iPhone made available by Apple Continuity Camera appears automatically.</p></details>

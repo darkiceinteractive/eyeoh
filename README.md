@@ -49,7 +49,7 @@ See `RELEASE_READINESS.md` for the current Mac App Store, Setapp, and free direc
 APP_IDENTITY="Developer ID Application: Your Company (TEAMID)" ./Scripts/release_direct.sh
 ```
 
-The public website lives in `Website/`. Its download is populated only after an explicitly authorized notarization run succeeds.
+The public website lives in `Website/`. Its primary DMG and fallback ZIP downloads are populated only after an explicitly authorized notarization run succeeds.
 
 ## Privacy and diagnostics
 

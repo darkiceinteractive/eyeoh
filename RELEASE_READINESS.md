@@ -1,6 +1,6 @@
 # EyeOh release readiness
 
-Checked: 10 August 2026 (Australia/Brisbane)
+Checked: 11 August 2026 (Australia/Brisbane)
 
 ## Recommendation
 
@@ -74,14 +74,14 @@ Primary sources:
 
 ## Direct free-download assessment
 
-This is the shortest release path. Apple requires a public direct-distribution build to be signed with a Developer ID Application certificate, use Hardened Runtime and a secure timestamp, and be notarized. The final ticket should be stapled before publishing the ZIP.
+This is the shortest release path. Apple requires a public direct-distribution build to be signed with a Developer ID Application certificate, use Hardened Runtime and a secure timestamp, and be notarized. EyeOh's primary download is a stapled DMG containing the app and an Applications shortcut; a ZIP remains available as a fallback.
 
-Current local state (machine-specific signing details intentionally omitted):
+Current release state (machine-specific signing details intentionally omitted):
 
-- EyeOh `0.3.0 (5)` is built as a universal `arm64` + `x86_64` app, signed with the Dark Ice Developer ID certificate, and archived at `dist/EyeOh-0.3.0.zip`. Signature verification passes; it remains intentionally unnotarized until submission is authorized.
-- `Scripts/release_direct.sh` builds a universal Apple Silicon/Intel app, signs it with the `APP_IDENTITY` supplied by the maintainer, verifies it, and creates a ZIP.
-- Passing `--notarize` submits through `notarytool`, staples and validates the ticket, verifies Gatekeeper acceptance, then creates `Website/public/downloads/EyeOh.zip` for the Astro build.
-- Notary credentials have not been assumed or tested. Set `NOTARY_PROFILE` to an existing `notarytool` Keychain profile only when publication is authorized.
+- EyeOh `0.3.0 (5)` is built as a universal `arm64` + `x86_64` app, signed with the Dark Ice Developer ID certificate, notarized and stapled as both the app and signed DMG, and published at `https://eyeoh.app/downloads/EyeOh.dmg` with a ZIP fallback. Gatekeeper accepts the DMG and mounted app as Notarized Developer ID software, and the downloaded files match the local SHA-256 release checksums.
+- `Scripts/release_direct.sh` builds a universal Apple Silicon/Intel app, signs it with the `APP_IDENTITY` supplied by the maintainer, verifies it, and creates a DMG plus fallback ZIP.
+- Passing `--notarize` submits the app archive through `notarytool`, staples the app, builds and notarizes the DMG, validates both tickets, verifies Gatekeeper acceptance, then creates `Website/public/downloads/EyeOh.dmg` and `EyeOh.zip` for the Astro build.
+- The validated `notarytool` Keychain profile is named `eyeoh`. Keep it in Keychain and pass it through `NOTARY_PROFILE=eyeoh` for authorized releases.
 
 Primary sources:
 
@@ -123,7 +123,7 @@ Primary sources:
 - [x] Branded Help and About views, feedback mail action, and an implemented consent-gated diagnostics boundary.
 - [x] EU-only PostHog and Sentry release configuration with source builds offline by default.
 - [x] Native Settings window with Service Management launch-at-login, separate off-by-default reporting choices, and consolidated Help/About/system actions.
-- [x] Universal-build, Developer ID, Hardened Runtime, ZIP, and notarization scripts.
+- [x] Universal-build, Developer ID, Hardened Runtime, DMG/ZIP, and notarization scripts.
 - [x] Public-source/private-release boundary documented; upstream GitHub Actions limited to a manual, read-only, secret-free source validation run.
 - [x] Rerun the App Sandbox probe for `au.com.darkice.eyeoh`, including the explicitly opt-in state-restoring write check.
 - [x] Build and inspect a universal EyeOh Developer ID-signed release candidate: `arm64` + `x86_64`, Hardened Runtime, secure timestamp, signature and ZIP verified. Gatekeeper correctly reports it as unnotarized until the remaining submission step.
@@ -132,7 +132,8 @@ Primary sources:
 - [ ] Deploy and validate the rate-limited `telemetry.eyeoh.app` PostHog gateway before enabling usage statistics in production.
 - [ ] Add the final repository, support, and privacy URLs to release metadata and the website.
 - [ ] Complete the provider-side and receipt checks in `TELEMETRY.md`; current source build has no provider credentials.
-- [ ] Configure or identify a `notarytool` Keychain profile.
-- [ ] Explicitly authorize notarization submission.
-- [ ] Notarize, staple, verify Gatekeeper, and smoke-test the downloaded ZIP on a clean user account.
-- [ ] Deploy the website and publish the notarized ZIP.
+- [x] Configure and validate the `eyeoh` `notarytool` Keychain profile.
+- [x] Receive explicit authorization and submit the release to Apple notarization.
+- [x] Sign, notarize and staple the app and DMG; verify the DMG and mounted app with Gatekeeper; verify that published DMG/ZIP checksums match the release artifacts.
+- [x] Deploy the website and publish the notarized DMG plus fallback ZIP at `eyeoh.app`.
+- [ ] Smoke-test the downloaded DMG from a fresh macOS user account.

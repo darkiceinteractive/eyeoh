@@ -9,6 +9,7 @@ interface Props {
 
 const { title, description } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site);
+const downloadURL = import.meta.env.PUBLIC_DOWNLOAD_URL;
 ---
 <!doctype html>
 <html lang="en-AU">
@@ -34,7 +35,11 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
           <a href="/#features">Features</a>
           <a href="/#faq">FAQ</a>
           <a href="/support/">Support</a>
-          <span class="button button-small" aria-disabled="true">Free · Coming soon</span>
+          {downloadURL ? (
+            <a class="button button-small" href={downloadURL}>Download · Free</a>
+          ) : (
+            <span class="button button-small" aria-disabled="true">Free · Coming soon</span>
+          )}
         </nav>
       </div>
     </header>

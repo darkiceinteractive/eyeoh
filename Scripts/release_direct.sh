@@ -43,6 +43,7 @@ APP_BUNDLE="$PROJECT_ROOT/build/EyeOh.app"
 DSYM_BUNDLE="$PROJECT_ROOT/build/EyeOh.app.dSYM"
 DIST_DIR="$PROJECT_ROOT/dist"
 ARCHIVE="$DIST_DIR/EyeOh-$MARKETING_VERSION.zip"
+DISK_IMAGE="$DIST_DIR/EyeOh-$MARKETING_VERSION.dmg"
 mkdir -p "$DIST_DIR"
 rm -f "$ARCHIVE"
 ditto -c -k --keepParent --norsrc --noextattr --noqtn --noacl "$APP_BUNDLE" "$ARCHIVE"
@@ -73,14 +74,26 @@ if [[ "$NOTARIZE" == "1" ]]; then
 
     rm -f "$ARCHIVE"
     ditto -c -k --keepParent --norsrc --noextattr --noqtn --noacl "$APP_BUNDLE" "$ARCHIVE"
+    "$PROJECT_ROOT/Scripts/create_dmg.sh" "$APP_BUNDLE" "$DISK_IMAGE"
+    codesign --force --timestamp --sign "$APP_IDENTITY" "$DISK_IMAGE"
+    codesign --verify --strict --verbose=2 "$DISK_IMAGE"
+
+    xcrun notarytool submit "$DISK_IMAGE" --keychain-profile "$NOTARY_PROFILE" --wait
+    xcrun stapler staple "$DISK_IMAGE"
+    xcrun stapler validate "$DISK_IMAGE"
     spctl --assess --type execute --verbose=2 "$APP_BUNDLE"
 
     mkdir -p "$PROJECT_ROOT/Website/public/downloads"
     cp "$ARCHIVE" "$PROJECT_ROOT/Website/public/downloads/EyeOh.zip"
-    echo "Notarized website download created at Website/public/downloads/EyeOh.zip"
+    cp "$DISK_IMAGE" "$PROJECT_ROOT/Website/public/downloads/EyeOh.dmg"
+    echo "Notarized website downloads created at Website/public/downloads/EyeOh.dmg and EyeOh.zip"
 else
-    echo "Created signed release candidate at $ARCHIVE"
+    "$PROJECT_ROOT/Scripts/create_dmg.sh" "$APP_BUNDLE" "$DISK_IMAGE"
+    codesign --force --timestamp --sign "$APP_IDENTITY" "$DISK_IMAGE"
+    codesign --verify --strict --verbose=2 "$DISK_IMAGE"
+    echo "Created signed release candidates at $DISK_IMAGE and $ARCHIVE"
     echo "It has not been notarized and was not copied into the public website."
 fi
 
 shasum -a 256 "$ARCHIVE"
+shasum -a 256 "$DISK_IMAGE"
