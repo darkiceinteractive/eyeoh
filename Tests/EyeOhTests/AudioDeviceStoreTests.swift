@@ -175,6 +175,106 @@ final class AudioDeviceStoreTests: XCTestCase {
         XCTAssertEqual(controller.inputVolumes[usb.id], 0.4)
     }
 
+    func testDisconnectedBluetoothInputReconnectsWithoutChangingOutput() async {
+        let defaultsName = "EyeOhTests.\(UUID().uuidString)"
+        let defaults = UserDefaults(suiteName: defaultsName)!
+        defer { defaults.removePersistentDomain(forName: defaultsName) }
+        let remembered = RememberedBluetoothDevices(defaults: defaults)
+        let builtIn = AudioDevice(
+            id: 1,
+            uid: "built-in",
+            name: "MacBook Pro Microphone",
+            transport: .builtIn,
+            channelCount: 1
+        )
+        let onyxInput = AudioDevice(
+            id: 2,
+            uid: "BC-87-FA-9C-65-E0:input",
+            name: "Onyx Star",
+            transport: .bluetooth,
+            channelCount: 1
+        )
+        let speakers = AudioDevice(
+            id: 3,
+            uid: "speakers",
+            name: "MacBook Pro Speakers",
+            transport: .builtIn,
+            channelCount: 2
+        )
+        let onyxOutput = AudioDevice(
+            id: 4,
+            uid: "BC-87-FA-9C-65-E0:output",
+            name: "Onyx Star",
+            transport: .bluetooth,
+            channelCount: 2
+        )
+        remembered.remember(onyxInput, direction: .input)
+
+        let controller = MockAudioController()
+        controller.devices = [builtIn]
+        controller.selectedID = builtIn.id
+        controller.outputs = [speakers]
+        controller.selectedOutputID = speakers.id
+        controller.selectedSystemOutputID = speakers.id
+        let connector = MockBluetoothConnector { address in
+            XCTAssertEqual(address, "BC-87-FA-9C-65-E0")
+            controller.devices = [builtIn, onyxInput]
+            controller.outputs = [speakers, onyxOutput]
+            // Reproduces macOS switching both routes as the Bluetooth audio
+            // profile becomes available.
+            controller.selectedID = onyxInput.id
+            controller.selectedOutputID = onyxOutput.id
+            controller.selectedSystemOutputID = onyxOutput.id
+        }
+        let store = AudioDeviceStore(
+            controller: controller,
+            bluetoothConnector: connector,
+            rememberedBluetoothDevices: remembered
+        )
+
+        XCTAssertEqual(store.rememberedInputDevices.first?.name, "Onyx Star")
+        await store.connectInput(store.rememberedInputDevices[0])
+
+        XCTAssertEqual(controller.selectedID, onyxInput.id)
+        XCTAssertEqual(controller.selectedOutputID, speakers.id)
+        XCTAssertEqual(controller.selectedSystemOutputID, speakers.id)
+        XCTAssertEqual(store.selectedDeviceID, onyxInput.id)
+        XCTAssertTrue(store.rememberedInputDevices.isEmpty)
+        XCTAssertNil(store.errorMessage)
+    }
+
+    func testFailedBluetoothReconnectLeavesUsefulError() async {
+        let defaultsName = "EyeOhTests.\(UUID().uuidString)"
+        let defaults = UserDefaults(suiteName: defaultsName)!
+        defer { defaults.removePersistentDomain(forName: defaultsName) }
+        let remembered = RememberedBluetoothDevices(defaults: defaults)
+        let onyx = AudioDevice(
+            id: 2,
+            uid: "BC-87-FA-9C-65-E0:output",
+            name: "Onyx Star",
+            transport: .bluetooth,
+            channelCount: 2
+        )
+        remembered.remember(onyx, direction: .output)
+
+        let controller = MockAudioController()
+        controller.devices = [onyx]
+        controller.selectedID = onyx.id
+        controller.outputs = []
+        controller.selectedOutputID = 99
+        let connector = MockBluetoothConnector(error: BluetoothConnectionError.notPaired)
+        let store = AudioDeviceStore(
+            controller: controller,
+            bluetoothConnector: connector,
+            rememberedBluetoothDevices: remembered
+        )
+
+        await store.connectOutput(store.rememberedOutputDevices[0])
+
+        XCTAssertTrue(store.errorMessage?.contains("Couldn't connect to Onyx Star") == true)
+        XCTAssertNil(store.connectingBluetoothAddress)
+    }
+
     func testCoreAudioCanReadAndReapplyCurrentDefault() throws {
         guard ProcessInfo.processInfo.environment["EYEOH_RUN_HARDWARE_TESTS"] == "1" else {
             throw XCTSkip("Set EYEOH_RUN_HARDWARE_TESTS=1 to run the state-changing hardware test.")
@@ -218,6 +318,7 @@ private final class MockAudioController: AudioDeviceControlling, @unchecked Send
     var selectedID: AudioDeviceID = 0
     var outputs: [AudioDevice] = []
     var selectedOutputID: AudioDeviceID = 0
+    var selectedSystemOutputID: AudioDeviceID = 0
     var setError: Error?
     var inputVolumes: [AudioDeviceID: Float32] = [:]
     var outputVolumes: [AudioDeviceID: Float32] = [:]
@@ -238,6 +339,10 @@ private final class MockAudioController: AudioDeviceControlling, @unchecked Send
         selectedOutputID
     }
 
+    func defaultSystemOutputDeviceID() throws -> AudioDeviceID {
+        selectedSystemOutputID == 0 ? selectedOutputID : selectedSystemOutputID
+    }
+
     func setDefaultInputDevice(_ id: AudioDeviceID) throws {
         if let setError { throw setError }
         selectedID = id
@@ -246,6 +351,12 @@ private final class MockAudioController: AudioDeviceControlling, @unchecked Send
     func setDefaultOutputDevice(_ id: AudioDeviceID) throws {
         if let setError { throw setError }
         selectedOutputID = id
+        selectedSystemOutputID = id
+    }
+
+    func setSystemOutputDevice(_ id: AudioDeviceID) throws {
+        if let setError { throw setError }
+        selectedSystemOutputID = id
     }
 
     func setInputVolume(_ scalar: Float32, for id: AudioDeviceID) throws {
@@ -256,5 +367,27 @@ private final class MockAudioController: AudioDeviceControlling, @unchecked Send
     func setOutputVolume(_ scalar: Float32, for id: AudioDeviceID) throws {
         if let setError { throw setError }
         outputVolumes[id] = scalar
+    }
+}
+
+private final class MockBluetoothConnector: BluetoothDeviceConnecting, @unchecked Sendable {
+    private let error: Error?
+    private let onConnect: @Sendable (String) -> Void
+
+    init(
+        error: Error? = nil,
+        onConnect: @escaping @Sendable (String) -> Void = { _ in }
+    ) {
+        self.error = error
+        self.onConnect = onConnect
+    }
+
+    convenience init(onConnect: @escaping @Sendable (String) -> Void) {
+        self.init(error: nil, onConnect: onConnect)
+    }
+
+    func connect(address: String) async throws {
+        if let error { throw error }
+        onConnect(address)
     }
 }

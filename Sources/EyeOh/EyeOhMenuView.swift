@@ -12,23 +12,29 @@ struct EyeOhMenuView: View {
     var body: some View {
         Group {
             Section("Input") {
-                if store.devices.isEmpty {
+                if store.devices.isEmpty && store.rememberedInputDevices.isEmpty {
                     Text("No input devices available")
                         .foregroundStyle(.secondary)
                 } else {
                     ForEach(store.devices) { device in
                         inputButton(for: device)
                     }
+                    ForEach(store.rememberedInputDevices) { remembered in
+                        rememberedInputButton(for: remembered)
+                    }
                 }
             }
 
             Section("Output") {
-                if store.outputDevices.isEmpty {
+                if store.outputDevices.isEmpty && store.rememberedOutputDevices.isEmpty {
                     Text("No output devices available")
                         .foregroundStyle(.secondary)
                 } else {
                     ForEach(store.outputDevices) { device in
                         outputButton(for: device)
+                    }
+                    ForEach(store.rememberedOutputDevices) { remembered in
+                        rememberedOutputButton(for: remembered)
                     }
                 }
             }
@@ -183,6 +189,30 @@ struct EyeOhMenuView: View {
         )
     }
 
+    private func rememberedInputButton(for remembered: RememberedBluetoothAudioDevice) -> some View {
+        Button {
+            Task { await store.connectInput(remembered) }
+        } label: {
+            rememberedBluetoothLabel(remembered)
+        }
+        .disabled(store.connectingBluetoothAddress != nil)
+        .accessibilityLabel(
+            "\(remembered.name), disconnected remembered Bluetooth input. Connect and select."
+        )
+    }
+
+    private func rememberedOutputButton(for remembered: RememberedBluetoothAudioDevice) -> some View {
+        Button {
+            Task { await store.connectOutput(remembered) }
+        } label: {
+            rememberedBluetoothLabel(remembered)
+        }
+        .disabled(store.connectingBluetoothAddress != nil)
+        .accessibilityLabel(
+            "\(remembered.name), disconnected remembered Bluetooth output. Connect and select."
+        )
+    }
+
     private func cameraButton(for camera: CameraDevice) -> some View {
         let selected = camera.id == cameraStore.selectedCameraID
         return Button {
@@ -214,6 +244,18 @@ struct EyeOhMenuView: View {
             }
         }
         .help("\(device.name) · \(device.transport.rawValue)")
+    }
+
+    private func rememberedBluetoothLabel(_ remembered: RememberedBluetoothAudioDevice) -> some View {
+        let connecting = store.isConnecting(remembered)
+        return Label {
+            Text("\(compactMenuName(remembered.name)) · \(connecting ? "Connecting…" : "Connect")")
+                .foregroundStyle(.secondary)
+        } icon: {
+            Image(systemName: connecting ? "arrow.trianglehead.2.clockwise.rotate.90" : "wave.3.right")
+                .foregroundStyle(connecting ? DarkIceBrand.iceBlue : .secondary)
+        }
+        .help("\(remembered.name) · Disconnected Bluetooth device")
     }
 
     private func cameraLabel(_ camera: CameraDevice, selected: Bool) -> some View {

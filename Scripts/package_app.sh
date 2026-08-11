@@ -70,6 +70,7 @@ cat > "$APP_BUNDLE/Contents/Info.plist" <<PLIST
     <key>LSUIElement</key><true/>
     <key>NSCameraUsageDescription</key><string>Camera access is used only to show a live preview while you choose a preferred camera.</string>
     <key>NSCameraUseContinuityCameraDeviceType</key><true/>
+    <key>NSBluetoothAlwaysUsageDescription</key><string>Bluetooth access lets EyeOh reconnect paired audio devices you choose from its menu. EyeOh never pairs new devices automatically.</string>
     <key>NSHumanReadableCopyright</key><string>Copyright © 2026 Dark Ice Interactive Pty Ltd</string>
 </dict>
 </plist>

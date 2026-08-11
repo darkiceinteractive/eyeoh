@@ -8,6 +8,7 @@ EyeOh is a free Dark Ice utility. Its app mark and colour system use the canonic
 
 - Lists input devices Core Audio says can be a system default, including USB, Bluetooth, built-in, and usable virtual drivers such as BlackHole or Loopback while excluding private Teams/Zoom endpoints.
 - Lists output devices and switches both the default app output and macOS system-sound output.
+- Remembers Bluetooth audio devices that EyeOh has previously seen and can reconnect a disconnected paired route when you explicitly choose it.
 - Shows software volume for capable selected devices and remembers separate input/output presets by device.
 - Lists built-in, external, Desk View, and available iPhone Continuity cameras.
 - Sets macOS's public user-preferred camera and provides an explicitly opened live preview that is never recorded.
@@ -18,6 +19,8 @@ EyeOh is a free Dark Ice utility. Its app mark and colour system use the canonic
 - Includes a native Settings window with launch-at-login, privacy choices, Help, About and a pre-addressed feedback email with only the app and macOS versions filled in.
 
 EyeOh changes the macOS **system default input**. An app such as Teams or Zoom can be configured to use a specific device instead of the system default; in that case, change the app's own microphone setting back to “Default” for it to follow EyeOh.
+
+Bluetooth reconnect shortcuts are local and explicit. EyeOh remembers only a Bluetooth device that has already appeared as a Core Audio input or output, stores its identifier on this Mac, and asks macOS to reconnect only when you click its disconnected row. It does not scan for arbitrary accessories, pair new devices, or auto-connect at launch.
 
 Camera selection sets macOS's **user-preferred camera**. Apps that follow Apple's system camera preference can adopt it; an app with its own pinned camera can still override it. Camera permission is requested only when you open the preview window. An eligible nearby iPhone appears automatically through Continuity Camera and does not require a separate EyeOh phone app.
 
@@ -43,7 +46,7 @@ The ad-hoc signed app bundle is created at `build/EyeOh.app` and launched automa
 
 ## Release preparation
 
-See `RELEASE_READINESS.md` for the current Mac App Store, Setapp, and free direct-download assessment, and `RELEASING.md` for the public-source/private-release security boundary. To create a universal Developer ID-signed release candidate without submitting it for notarization:
+See `RELEASE_READINESS.md` for the current Mac App Store, Setapp, and free direct-download assessment, `APP_REVIEW_NOTES.md` for capability justification and reviewer steps, and `RELEASING.md` for the public-source/private-release security boundary. To create a universal Developer ID-signed release candidate without submitting it for notarization:
 
 ```bash
 APP_IDENTITY="Developer ID Application: Your Company (TEAMID)" ./Scripts/release_direct.sh

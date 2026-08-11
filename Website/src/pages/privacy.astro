@@ -5,11 +5,11 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   <article class="container legal-copy legal-page">
     <p class="eyebrow">Privacy</p>
     <h1>Private first, and specific about the rest.</h1>
-    <p>Last updated 10 August 2026.</p>
-    <p>Dark Ice Interactive Pty Ltd (“Dark Ice”) is responsible for EyeOh. The app reads audio and camera device information that macOS exposes locally and changes a preference only when you choose a device.</p>
+    <p>Last updated 11 August 2026.</p>
+    <p>Dark Ice Interactive Pty Ltd (“Dark Ice”) is responsible for EyeOh. The app reads audio, camera and remembered Bluetooth audio-device information that macOS exposes locally and changes a preference or requests a Bluetooth reconnection only when you choose a device.</p>
 
     <h2>Core app data stays on your Mac</h2>
-    <p>EyeOh does not record microphone audio or camera video, create an account, read contacts, display advertising, or sell data. Camera access is requested only when you explicitly open the local live preview; the capture session stops when the window closes. Device names, macOS device identifiers, and per-device volume presets remain on your Mac.</p>
+    <p>EyeOh does not record microphone audio or camera video, create an account, read contacts, display advertising, or sell data. Camera access is requested only when you explicitly open the local live preview; the capture session stops when the window closes. Bluetooth access is requested only when you ask EyeOh to reconnect a remembered paired audio device. EyeOh does not pair new devices or connect them automatically. Device names, macOS and Bluetooth device identifiers, remembered routes, and per-device volume presets remain on your Mac.</p>
 
     <h2>Optional product statistics</h2>
     <p>“Share private usage statistics” is off by default. If you turn it on, EyeOh sends one of six fixed events—app launched, input changed, output changed, camera changed, preview opened, or feedback opened—to PostHog’s EU service. Each event includes a random installation identifier, EyeOh version and build, distribution channel, and schema version. EyeOh disables IP geolocation and does not create a PostHog person profile.</p>

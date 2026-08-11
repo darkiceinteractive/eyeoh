@@ -1,6 +1,6 @@
 # EyeOh telemetry plan
 
-EyeOh 0.3.0 supports optional PostHog product statistics and Sentry crash reporting. Both controls are separate, off by default, and unavailable in source builds that have no release configuration.
+EyeOh supports optional PostHog product statistics and Sentry crash reporting. Both controls are separate, off by default, and unavailable in source builds that have no release configuration.
 
 Consent schema version 1 deliberately clears any saved values from the earlier placeholder-only settings. Offline/source builds also force unavailable choices off. A user therefore has to make a fresh choice in an official configured build before the first network event can be created.
 

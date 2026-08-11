@@ -1,6 +1,5 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import ProductMenu from '../components/ProductMenu.astro';
 import logo from '../../assets/eyeoh-mark.svg';
 
 const downloadURL = import.meta.env.PUBLIC_DOWNLOAD_URL;
@@ -25,9 +24,18 @@ const zipDownloadURL = import.meta.env.PUBLIC_ZIP_DOWNLOAD_URL;
           )}
           <a class="text-link" href="#install">How to install <span aria-hidden="true">→</span></a>
         </div>
-        <p class="release-meta">Version 0.3.0 · macOS 14 or later · Apple Silicon and Intel</p>
+        <p class="release-meta">Version 0.4.0 · macOS 14 or later · Apple Silicon and Intel</p>
       </div>
-      <div class="product-stage"><div class="ambient" aria-hidden="true"></div><ProductMenu /></div>
+      <div class="product-stage">
+        <div class="ambient" aria-hidden="true"></div>
+        <img
+          class="product-screenshot"
+          src="/assets/eyeoh-menu-iphone.png"
+          width="363"
+          height="602"
+          alt="EyeOh menu showing selected audio routes alongside an iPhone microphone, iPhone camera and Desk View camera"
+        />
+      </div>
     </div>
   </section>
 
@@ -38,6 +46,7 @@ const zipDownloadURL = import.meta.env.PUBLIC_ZIP_DOWNLOAD_URL;
       <div class="feature-grid">
         <article><span class="feature-icon" aria-hidden="true">↳</span><h3>Input, instantly</h3><p>Move between built-in, USB, Bluetooth, and useful virtual microphones with a click.</p></article>
         <article><span class="feature-icon" aria-hidden="true">↗</span><h3>Output, too</h3><p>Send apps and system sounds to speakers, displays, audio interfaces, or headphones.</p></article>
+        <article><span class="feature-icon" aria-hidden="true">⌁</span><h3>Reconnect, then route</h3><p>Keep a previously used Bluetooth audio device within reach, even while it is disconnected.</p></article>
         <article><span class="feature-icon" aria-hidden="true">≋</span><h3>Your levels, remembered</h3><p>EyeOh restores a preferred input gain or output volume for each capable device.</p></article>
         <article><span class="feature-icon" aria-hidden="true">▣</span><h3>See the angle first</h3><p>Choose a preferred camera and open a private live preview only when you want it.</p></article>
       </div>
@@ -70,6 +79,7 @@ const zipDownloadURL = import.meta.env.PUBLIC_ZIP_DOWNLOAD_URL;
         <details><summary>Why didn’t macOS Voice Control change microphones?</summary><p>Voice Control has its own microphone choice under System Settings → Accessibility → Voice Control. Apple does not provide apps with a supported way to change that separate selection, so choose the same microphone there or use Automatic.</p></details>
         <details><summary>Does EyeOh need microphone permission?</summary><p>No. It changes device settings but never captures microphone audio.</p></details>
         <details><summary>Why does camera preview need permission?</summary><p>macOS requires permission to show a live view. EyeOh asks only when you open Preview and stops when you close it.</p></details>
+        <details><summary>How does Bluetooth reconnect work?</summary><p>After EyeOh has seen a paired Bluetooth audio device, it can keep a dimmed shortcut while that device is disconnected. Click it to ask macOS to reconnect, select the route and restore its saved volume. EyeOh does not pair or automatically connect unknown devices, and you can hide or clear remembered shortcuts in Settings.</p></details>
         <details><summary>Can I use my iPhone camera?</summary><p>Yes. An eligible nearby iPhone made available by Apple Continuity Camera appears automatically.</p></details>
         <details><summary>What do the privacy switches send?</summary><p>Nothing while off. Statistics are six fixed feature events; crash reporting is technical crash/hang data. Neither includes device names, recordings, screenshots, or contact details.</p></details>
         <details><summary>Is EyeOh open source?</summary><p>Yes. EyeOh Core is MIT-licensed. Official Dark Ice names and artwork are protected separately.</p></details>

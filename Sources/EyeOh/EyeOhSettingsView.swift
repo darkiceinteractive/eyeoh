@@ -30,9 +30,10 @@ struct EyeOhSettingsView: View {
 }
 
 private struct GeneralSettingsView: View {
-    let store: AudioDeviceStore
+    @Bindable var store: AudioDeviceStore
     let cameraStore: CameraDeviceStore
     @Bindable var launchAtLogin: LaunchAtLoginController
+    @State private var confirmsClearingBluetoothDevices = false
 
     var body: some View {
         Form {
@@ -76,14 +77,44 @@ private struct GeneralSettingsView: View {
                 Button("Open Sound Settings…", systemImage: "speaker.wave.2") {
                     SystemSettingsLinks.openSound()
                 }
+
+                Button("Open Bluetooth Settings…", systemImage: "wave.3.right") {
+                    SystemSettingsLinks.openBluetooth()
+                }
             } header: {
                 Text("Devices")
             } footer: {
                 Text("Audio devices normally refresh automatically. Use Refresh Devices after reconnecting a camera or unusual virtual device.")
             }
+
+
+            Section {
+                Toggle(
+                    "Show disconnected Bluetooth audio devices",
+                    isOn: $store.showsDisconnectedBluetoothDevices
+                )
+
+                if store.rememberedBluetoothDeviceCount > 0 {
+                    Button("Clear Remembered Bluetooth Devices…", role: .destructive) {
+                        confirmsClearingBluetoothDevices = true
+                    }
+                }
+            } header: {
+                Text("Bluetooth shortcuts")
+            } footer: {
+                Text("EyeOh remembers only Bluetooth audio devices that have appeared as a Mac input or output. Clicking a disconnected device asks macOS to connect it; EyeOh never pairs new devices automatically.")
+            }
         }
         .formStyle(.grouped)
         .onAppear { launchAtLogin.refresh() }
+        .alert("Clear Remembered Bluetooth Devices?", isPresented: $confirmsClearingBluetoothDevices) {
+            Button("Cancel", role: .cancel) {}
+            Button("Clear", role: .destructive) {
+                store.clearRememberedBluetoothDevices()
+            }
+        } message: {
+            Text("This removes EyeOh's local shortcuts. It does not unpair devices from your Mac or remove their saved volume presets.")
+        }
     }
 }
 
@@ -163,6 +194,13 @@ enum SystemSettingsLinks {
     static func openSound() {
         guard let url = URL(
             string: "x-apple.systempreferences:com.apple.Sound-Settings.extension"
+        ) else { return }
+        NSWorkspace.shared.open(url)
+    }
+
+    static func openBluetooth() {
+        guard let url = URL(
+            string: "x-apple.systempreferences:com.apple.Bluetooth-Settings.extension"
         ) else { return }
         NSWorkspace.shared.open(url)
     }

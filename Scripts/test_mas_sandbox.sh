@@ -27,6 +27,7 @@ cat > "$PROBE_APP/Contents/Info.plist" <<PLIST
     <key>CFBundlePackageType</key><string>APPL</string>
     <key>CFBundleShortVersionString</key><string>1.0</string>
     <key>CFBundleVersion</key><string>1</string>
+    <key>NSBluetoothAlwaysUsageDescription</key><string>Bluetooth access lets EyeOh reconnect paired audio devices you choose from its menu. EyeOh never pairs new devices automatically.</string>
 </dict>
 </plist>
 PLIST
@@ -37,4 +38,6 @@ codesign \
     --entitlements "$PROJECT_ROOT/Config/EyeOh-MAS.entitlements" \
     "$PROBE_APP"
 
+EYEOH_PROBE_WRITES="${EYEOH_PROBE_WRITES:-}" \
+EYEOH_PROBE_BLUETOOTH_READ="${EYEOH_PROBE_BLUETOOTH_READ:-}" \
 "$PROBE"

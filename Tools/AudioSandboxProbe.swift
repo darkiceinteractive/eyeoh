@@ -1,4 +1,5 @@
 import Foundation
+import IOBluetooth
 
 @main
 struct AudioSandboxProbe {
@@ -33,6 +34,12 @@ struct AudioSandboxProbe {
             ? "read/write-current"
             : "read"
         print("Sandbox \(mode) probe passed: \(inputs.count) inputs, \(outputs.count) outputs.")
+
+        if ProcessInfo.processInfo.environment["EYEOH_PROBE_BLUETOOTH_READ"] == "1" {
+            let paired = (IOBluetoothDevice.pairedDevices() as? [IOBluetoothDevice]) ?? []
+            let pairedAddresses = Set(paired.compactMap(\.addressString))
+            print("Sandbox Bluetooth probe passed: \(pairedAddresses.count) paired devices visible.")
+        }
     }
 }
 

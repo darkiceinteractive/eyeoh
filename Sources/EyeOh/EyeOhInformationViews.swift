@@ -13,6 +13,11 @@ struct EyeOhHelpView: View {
                     text: "Open EyeOh from the menu bar, then click an input, output or camera. The green check shows the current macOS preference."
                 )
                 helpItem(
+                    icon: "bolt.horizontal.circle",
+                    title: "Reconnect Bluetooth audio",
+                    text: "After EyeOh has seen a Bluetooth microphone or speaker, it can keep a dimmed shortcut in the menu while that device is disconnected. Click Connect to ask macOS to reconnect it, wait for the route to appear, then select it and restore its saved volume. EyeOh never pairs new devices."
+                )
+                helpItem(
                     icon: "slider.horizontal.3",
                     title: "An app did not follow",
                     text: "Zoom, Teams and other apps can pin their own device. Set that app to Default or Automatic so it follows EyeOh."
@@ -80,7 +85,7 @@ struct EyeOhAboutView: View {
                     .foregroundStyle(.secondary)
             }
 
-            Text("Quickly switch your Mac's audio input, audio output and preferred camera.")
+            Text("Quickly reconnect and switch your Mac's audio input, audio output and preferred camera.")
                 .multilineTextAlignment(.center)
                 .frame(maxWidth: 340)
 

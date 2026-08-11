@@ -8,7 +8,8 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     <h2>Voice Control did not follow the selected microphone</h2><p>macOS Voice Control maintains its own microphone selection. Open System Settings → Accessibility → Voice Control, then choose the same microphone or Automatic. Apple does not provide EyeOh with a supported way to change this separate setting.</p>
     <h2>An app did not follow the preferred camera</h2><p>EyeOh sets macOS’s preferred camera, but meeting and browser apps can retain their own selection. Choose the system or automatic camera option when available.</p>
     <h2>Camera preview is unavailable</h2><p>Open System Settings → Privacy &amp; Security → Camera and allow EyeOh. Preview starts only when requested and stops when its window closes.</p>
-    <h2>A device is missing</h2><p>Confirm it appears in System Settings → Sound, reconnect the USB or Bluetooth device, then use Refresh Devices in EyeOh Settings.</p>
+    <h2>A Bluetooth audio device is disconnected</h2><p>After EyeOh has seen a Bluetooth device as a Mac input or output once, it keeps a dimmed Connect shortcut in that section. Click it to ask macOS to reconnect and select the route. The device must be on, nearby, already paired, and not in use by another computer or phone.</p>
+    <h2>A device is missing</h2><p>Confirm it appears in System Settings → Sound, reconnect the USB device, then use Refresh Devices in EyeOh Settings. For Bluetooth, connect it once through macOS so EyeOh can remember its audio route.</p>
     <h2>Get help</h2><p>Email <a href="mailto:darkice@darkice.co?subject=EyeOh%20feedback">darkice@darkice.co</a> or use Send Feedback inside EyeOh. Include the device type and what you expected. Please do not send recordings or private meeting information.</p>
   </article>
 </BaseLayout>

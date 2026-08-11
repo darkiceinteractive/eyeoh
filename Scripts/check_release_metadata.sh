@@ -16,4 +16,18 @@ if ! grep -Fq "## $MARKETING_VERSION" "$PROJECT_ROOT/CHANGELOG.md"; then
     exit 1
 fi
 
+if ! grep -Fq "NSBluetoothAlwaysUsageDescription" "$PROJECT_ROOT/Scripts/package_app.sh"; then
+    echo "Packaged builds are missing the Bluetooth purpose string." >&2
+    exit 1
+fi
+
+for ENTITLEMENTS in \
+    "$PROJECT_ROOT/Config/EyeOh-Direct.entitlements" \
+    "$PROJECT_ROOT/Config/EyeOh-MAS.entitlements"; do
+    if ! grep -Fq "com.apple.security.device.bluetooth" "$ENTITLEMENTS"; then
+        echo "Bluetooth entitlement missing from $ENTITLEMENTS." >&2
+        exit 1
+    fi
+done
+
 echo "Release metadata matches version $MARKETING_VERSION."
