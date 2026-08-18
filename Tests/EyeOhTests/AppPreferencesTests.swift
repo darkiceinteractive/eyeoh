@@ -49,4 +49,17 @@ final class AppPreferencesTests: XCTestCase {
         XCTAssertFalse(preferences.anonymousStatisticsEnabled)
         XCTAssertFalse(preferences.crashReportingEnabled)
     }
+
+    func testInputVolumeMenuControlDefaultsToOffAndPersists() {
+        let suiteName = "EyeOhTests.\(UUID().uuidString)"
+        let defaults = UserDefaults(suiteName: suiteName)!
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+
+        let initial = AppPreferences(defaults: defaults)
+        XCTAssertFalse(initial.showsInputVolumeInMenu)
+
+        initial.showsInputVolumeInMenu = true
+
+        XCTAssertTrue(AppPreferences(defaults: defaults).showsInputVolumeInMenu)
+    }
 }

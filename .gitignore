@@ -6,6 +6,9 @@ build/
 dist/
 Website/downloads/
 Website/public/downloads/
+Website/public/updates/*.zip
+Website/public/updates/*.delta
+Website/public/updates/old_updates/
 Website/node_modules/
 Website/dist/
 Website/.astro/

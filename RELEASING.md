@@ -17,6 +17,7 @@ The following values belong only in the Dark Ice local secret store or a future 
 
 - Apple Developer ID certificates and private keys.
 - Apple notarization credentials and Keychain profiles.
+- The Sparkle EdDSA private key stored in Keychain under the dedicated EyeOh account.
 - `SENTRY_AUTH_TOKEN`, `SENTRY_ORG` and `SENTRY_PROJECT`.
 - PostHog personal or project-secret API keys.
 - Cloudflare deployment/API credentials.
@@ -26,6 +27,8 @@ The following values belong only in the Dark Ice local secret store or a future 
 ## Official release boundary
 
 Official releases are built on an authorised Dark Ice Mac using `Scripts/release_direct.sh`. Release values are loaded from `~/.darkiceconfig/aiconfig.env`, never printed, and never committed. The build must be Developer ID signed, notarized, stapled, checked with Gatekeeper, and manually attached to the official EyeOh GitHub release and website only after validation.
+
+For updater-enabled direct releases, the notarized ZIP is also signed with Sparkle's dedicated EyeOh EdDSA key and added to a generated appcast. `Scripts/prepare_appcast.sh` prepares these files locally; it never deploys them. Publish the immutable archive and delta files before the appcast so no client can discover an unavailable update. Mac App Store builds use `Scripts/build_mas_candidate.sh`, contain no Sparkle code, and update only through the App Store.
 
 There is deliberately no GitHub Actions release workflow. `.github/workflows/ci.yml` uses `workflow_dispatch`, which GitHub restricts to users with write access, performs only source validation, receives no secrets, and publishes no artifact.
 

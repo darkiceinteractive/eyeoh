@@ -7,6 +7,7 @@ struct EyeOhApp: App {
     @State private var cameraStore: CameraDeviceStore
     @State private var preferences: AppPreferences
     @State private var launchAtLogin: LaunchAtLoginController
+    @State private var softwareUpdater: SoftwareUpdateController
 
     init() {
         let store = AudioDeviceStore(controller: CoreAudioClient())
@@ -22,11 +23,17 @@ struct EyeOhApp: App {
         _cameraStore = State(initialValue: CameraDeviceStore(controller: AVCameraClient()))
         _preferences = State(initialValue: preferences)
         _launchAtLogin = State(initialValue: LaunchAtLoginController())
+        _softwareUpdater = State(initialValue: SoftwareUpdateController())
     }
 
     var body: some Scene {
         MenuBarExtra {
-            EyeOhMenuView(store: store, cameraStore: cameraStore)
+            EyeOhMenuView(
+                store: store,
+                cameraStore: cameraStore,
+                preferences: preferences,
+                softwareUpdater: softwareUpdater
+            )
         } label: {
             HStack(spacing: 3) {
                 Image(nsImage: IORouteStatusIcon.image)
@@ -37,7 +44,7 @@ struct EyeOhApp: App {
                 "\(store.statusAccessibilityLabel) Preferred camera: \(cameraStore.selectedCamera?.name ?? "No camera")."
             )
         }
-        .menuBarExtraStyle(.menu)
+        .menuBarExtraStyle(.window)
 
         Window("Camera Preview", id: "camera-preview") {
             CameraPreviewWindow(cameraStore: cameraStore)
@@ -50,7 +57,8 @@ struct EyeOhApp: App {
                 store: store,
                 cameraStore: cameraStore,
                 preferences: preferences,
-                launchAtLogin: launchAtLogin
+                launchAtLogin: launchAtLogin,
+                softwareUpdater: softwareUpdater
             )
         }
         .defaultSize(width: 620, height: 540)

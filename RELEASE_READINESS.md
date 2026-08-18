@@ -1,10 +1,10 @@
 # EyeOh release readiness
 
-Checked: 11 August 2026 (Australia/Brisbane)
+Checked: 12 August 2026 (Australia/Brisbane)
 
 ## Recommendation
 
-EyeOh is released as a free, Developer ID-signed and notarized direct download. This route matches the product, keeps installation simple, and uses the static website in this repository. Mac App Store submission is plausible but still needs a dedicated sandboxed Xcode distribution target and App Review. Setapp is a later commercial channel, not a free-download channel.
+EyeOh is released as a free, Developer ID-signed and notarized direct download. A Direct-only Sparkle updater and a separately compiled sandboxed MAS candidate path are now prepared locally. Mac App Store submission is plausible but still needs Dark Ice distribution/installer identities, a matching provisioning profile, an App Store Connect record and App Review. Setapp is a later commercial channel, not a free-download channel.
 
 EyeOh `0.4.0 (6)` is published at `eyeoh.app`. No Mac App Store or Setapp submission has been performed.
 
@@ -26,16 +26,17 @@ The gates are:
 2. The submission must be packaged using Xcode technology, be self-contained, and use App Store updates under 2.4.5(ii) and (vii).
 3. The app must use public APIs under guideline 2.5.1. The Core Audio constants and AVFoundation camera preference used by EyeOh are publicly documented.
 4. App Review still has discretion under minimum-functionality guideline 4.2; a focused utility is defensible, but approval cannot be guaranteed.
-5. A Mac App Store bundle needs an App Store Connect record, Mac Distribution signing/provisioning, screenshots, metadata, support/privacy URLs, and accurate App Privacy answers. With the optional providers enabled, “Data Not Collected” is no longer accurate: Product Interaction and Crash Data must be declared for Analytics/App Functionality, not used for tracking, and assessed carefully as not linked to identity. The random installation identifier may also require an identifier disclosure; confirm the final App Store Connect questionnaire rather than guessing.
+5. A Mac App Store bundle needs an App Store Connect record, Mac Distribution signing/provisioning, screenshots, metadata, support/privacy URLs, and accurate App Privacy answers. The prepared free MAS candidate has no provider configuration or network-client entitlement and uses the no-collected-data privacy manifest. If optional providers are enabled later, “Data Not Collected” is no longer accurate: Product Interaction and Crash Data must be declared for Analytics/App Functionality, not used for tracking, and assessed carefully as not linked to identity. The random installation identifier may also require an identifier disclosure; confirm the final App Store Connect questionnaire rather than guessing.
 
 Prepared locally:
 
-- `Config/EyeOh-MAS.entitlements` enables App Sandbox, the public camera capability for preview, Bluetooth for explicit paired-device reconnects, and outgoing network access required only when the user enables an optional reporting provider.
-- `Config/EyeOh-PrivacyInfo.xcprivacy` declares the optional product-interaction, random identifier, crash, hang/performance, and diagnostic categories as not linked and not used for tracking, plus the required-reason APIs used by EyeOh/Sentry.
+- `Config/EyeOh-MAS.entitlements` enables App Sandbox, the public camera capability for preview and Bluetooth for explicit paired-device reconnects. The initial offline MAS candidate does not request outgoing network access.
+- `Config/EyeOh-PrivacyInfo-Offline.xcprivacy` declares the required-reason APIs and no collected data for unconfigured builds. `Config/EyeOh-PrivacyInfo.xcprivacy` is reserved for builds that actually enable the optional product-interaction and crash-diagnostic providers.
 - `APP_REVIEW_NOTES.md` maps each requested sandbox capability to a visible feature and gives a reviewer a short, reproducible Bluetooth and camera test path.
 - `Scripts/test_mas_sandbox.sh` compiles a probe that enumerates devices and validates the current defaults inside App Sandbox. With `EYEOH_PROBE_WRITES=1`, it performs a state-restoring write check and restores input, normal output, and the independently selected system-sound output before exiting. With `EYEOH_PROBE_BLUETOOTH_READ=1`, it verifies that the sandboxed process can enumerate paired Bluetooth devices without exposing their names or addresses in logs.
 - The normal test suite is deterministic and does not depend on or write to attached audio hardware.
 - A real-device write check is available only with `EYEOH_RUN_HARDWARE_TESTS=1`; it snapshots and restores input, output, and the separate system-sound output.
+- `Scripts/build_mas_candidate.sh` creates an isolated universal MAS candidate and rejects any Sparkle linkage or updater keys. Its submission mode remains gated on Dark Ice Mac distribution and installer identities plus a matching provisioning profile.
 
 Primary sources:
 
@@ -58,6 +59,8 @@ Maintain two release configurations from the same source tree:
 Using the existing `au.com.darkice.eyeoh` bundle identifier for both configurations is the simplest product choice when installing one channel should replace the other. This is a product recommendation rather than an Apple requirement. Use separate identifiers only if side-by-side installation is genuinely needed, because that creates separate preferences, sandbox containers, receipts, and migration work. The App Store record's bundle identifier becomes fixed after a build is uploaded.
 
 The two editions may differ where sandbox or review rules require it. Compile direct-only functionality out of the MAS target, clearly compare editions on the website, and ensure MAS screenshots and metadata advertise only functionality present in the reviewed binary. The current free core has no payment conflict.
+
+That separation is now enforced by the package manifest and isolated channel build directories: Sparkle 2.9.5 is a Direct-only dependency, while MAS/source builds compile a no-op updater controller and are checked for accidental Sparkle links and feed keys. See `DISTRIBUTION_AND_MONETIZATION.md` for the operational release and free-now/IAP-later plan.
 
 Primary sources:
 

@@ -1,6 +1,25 @@
 // swift-tools-version: 6.2
 import PackageDescription
 
+let distributionChannel = Context.environment["EYEOH_DISTRIBUTION_CHANNEL"] ?? "source"
+let includesDirectUpdater = distributionChannel == "direct"
+
+var packageDependencies: [Package.Dependency] = []
+var eyeOhDependencies: [Target.Dependency] = ["Sentry"]
+var eyeOhLinkerSettings: [LinkerSetting] = []
+var eyeOhSwiftSettings: [SwiftSetting] = []
+
+if includesDirectUpdater {
+    packageDependencies.append(
+        .package(url: "https://github.com/sparkle-project/Sparkle.git", exact: "2.9.5")
+    )
+    eyeOhDependencies.append(.product(name: "Sparkle", package: "Sparkle"))
+    eyeOhSwiftSettings.append(.define("EYEOH_DIRECT_UPDATER"))
+    eyeOhLinkerSettings.append(
+        .unsafeFlags(["-Xlinker", "-rpath", "-Xlinker", "@executable_path/../Frameworks"])
+    )
+}
+
 let package = Package(
     name: "EyeOh",
     platforms: [
@@ -9,6 +28,7 @@ let package = Package(
     products: [
         .executable(name: "EyeOh", targets: ["EyeOh"]),
     ],
+    dependencies: packageDependencies,
     targets: [
         .binaryTarget(
             name: "Sentry",
@@ -17,10 +37,10 @@ let package = Package(
         ),
         .executableTarget(
             name: "EyeOh",
-            dependencies: [
-                "Sentry",
-            ],
-            path: "Sources/EyeOh"
+            dependencies: eyeOhDependencies,
+            path: "Sources/EyeOh",
+            swiftSettings: eyeOhSwiftSettings,
+            linkerSettings: eyeOhLinkerSettings
         ),
         .testTarget(
             name: "EyeOhTests",

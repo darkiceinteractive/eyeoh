@@ -1,6 +1,14 @@
 # Third-party notices
 
-EyeOh includes the following open-source component in official builds:
+EyeOh includes the following open-source components in official builds:
+
+## Sparkle
+
+- Project: <https://github.com/sparkle-project/Sparkle>
+- Version: 2.9.5
+- Licence: MIT, with bundled third-party notices
+
+Sparkle is included only in the direct-download edition. Its complete licence and required third-party notices are bundled as `Sparkle-LICENSE.txt` in that application. The Mac App Store edition does not link or embed Sparkle.
 
 ## Sentry Cocoa
 

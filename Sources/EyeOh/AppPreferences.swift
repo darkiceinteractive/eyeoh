@@ -6,6 +6,7 @@ enum AppPreferenceKeys {
     static let anonymousStatistics = "privacy.anonymousStatistics"
     static let crashReporting = "privacy.crashReporting"
     static let telemetryConsentVersion = "privacy.telemetryConsentVersion"
+    static let showsInputVolumeInMenu = "menu.showsInputVolume"
 }
 
 @MainActor
@@ -28,6 +29,14 @@ final class AppPreferences {
         }
     }
 
+    /// Output volume is always immediately available. Input gain is less commonly
+    /// adjusted, so it is an optional control in the compact menu-bar panel.
+    var showsInputVolumeInMenu: Bool {
+        didSet {
+            defaults.set(showsInputVolumeInMenu, forKey: AppPreferenceKeys.showsInputVolumeInMenu)
+        }
+    }
+
     init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
         if defaults.integer(forKey: AppPreferenceKeys.telemetryConsentVersion) >= Self.currentConsentVersion {
@@ -40,6 +49,7 @@ final class AppPreferences {
             defaults.set(false, forKey: AppPreferenceKeys.crashReporting)
             defaults.set(Self.currentConsentVersion, forKey: AppPreferenceKeys.telemetryConsentVersion)
         }
+        showsInputVolumeInMenu = defaults.bool(forKey: AppPreferenceKeys.showsInputVolumeInMenu)
     }
 
     func reconcileProviderAvailability(statisticsAvailable: Bool, crashReportingAvailable: Bool) {

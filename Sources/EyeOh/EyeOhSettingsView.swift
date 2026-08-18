@@ -6,13 +6,16 @@ struct EyeOhSettingsView: View {
     let cameraStore: CameraDeviceStore
     let preferences: AppPreferences
     let launchAtLogin: LaunchAtLoginController
+    let softwareUpdater: SoftwareUpdateController
 
     var body: some View {
         TabView {
             GeneralSettingsView(
                 store: store,
                 cameraStore: cameraStore,
-                launchAtLogin: launchAtLogin
+                preferences: preferences,
+                launchAtLogin: launchAtLogin,
+                softwareUpdater: softwareUpdater
             )
             .tabItem { Label("General", systemImage: "gearshape") }
 
@@ -32,7 +35,9 @@ struct EyeOhSettingsView: View {
 private struct GeneralSettingsView: View {
     @Bindable var store: AudioDeviceStore
     let cameraStore: CameraDeviceStore
+    @Bindable var preferences: AppPreferences
     @Bindable var launchAtLogin: LaunchAtLoginController
+    @Bindable var softwareUpdater: SoftwareUpdateController
     @State private var confirmsClearingBluetoothDevices = false
 
     var body: some View {
@@ -68,6 +73,40 @@ private struct GeneralSettingsView: View {
                 Text("EyeOh starts quietly in the menu bar. macOS may show it under General → Login Items.")
             }
 
+            if softwareUpdater.isAvailable {
+                Section {
+                    Toggle(
+                        "Automatically check for updates",
+                        isOn: Binding(
+                            get: { softwareUpdater.automaticallyChecksForUpdates },
+                            set: { enabled in
+                                softwareUpdater.setAutomaticallyChecksForUpdates(enabled)
+                            }
+                        )
+                    )
+
+                    Toggle(
+                        "Download updates automatically",
+                        isOn: Binding(
+                            get: { softwareUpdater.automaticallyDownloadsUpdates },
+                            set: { enabled in
+                                softwareUpdater.setAutomaticallyDownloadsUpdates(enabled)
+                            }
+                        )
+                    )
+                    .disabled(!softwareUpdater.automaticallyChecksForUpdates)
+
+                    Button("Check for Updates Now…", systemImage: "arrow.triangle.2.circlepath") {
+                        softwareUpdater.checkForUpdates()
+                    }
+                    .disabled(!softwareUpdater.canCheckForUpdates)
+                } header: {
+                    Text("Software updates")
+                } footer: {
+                    Text("Direct-download editions use signed EyeOh updates. Mac App Store editions update only through the App Store.")
+                }
+            }
+
             Section {
                 Button("Refresh Devices", systemImage: "arrow.clockwise") {
                     store.refresh()
@@ -85,6 +124,14 @@ private struct GeneralSettingsView: View {
                 Text("Devices")
             } footer: {
                 Text("Audio devices normally refresh automatically. Use Refresh Devices after reconnecting a camera or unusual virtual device.")
+            }
+
+            Section {
+                Toggle("Show input volume in menu bar", isOn: $preferences.showsInputVolumeInMenu)
+            } header: {
+                Text("Menu controls")
+            } footer: {
+                Text("Output volume is always available for a quick adjustment. Turn this on if you also want microphone input gain in the menu.")
             }
 
 
