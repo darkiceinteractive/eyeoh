@@ -46,13 +46,15 @@ The ad-hoc signed app bundle is created at `build/EyeOh.app` and launched automa
 
 ## Release preparation
 
-See `RELEASE_READINESS.md` for the current Mac App Store, dual-distribution, Setapp, and free direct-download assessment, `APP_REVIEW_NOTES.md` for capability justification and reviewer steps, and `RELEASING.md` for the public-source/private-release security boundary. To create a universal Developer ID-signed release candidate without submitting it for notarization:
+See `RELEASE_READINESS.md` for the current release assessment, `DISTRIBUTION_AND_MONETIZATION.md` for the Direct/MAS updater and free-now/IAP-later setup, `APP_REVIEW_NOTES.md` for capability justification and reviewer steps, and `RELEASING.md` for the public-source/private-release security boundary. To create a universal Developer ID-signed release candidate without submitting it for notarization:
 
 ```bash
 APP_IDENTITY="Developer ID Application: Your Company (TEAMID)" ./Scripts/release_direct.sh
 ```
 
 The public website lives in `Website/`. Its primary DMG and fallback ZIP downloads are populated only after an explicitly authorized notarization run succeeds.
+
+Direct-download builds include Sparkle and produce signed appcast material only after notarization. Mac App Store and source builds compile the updater out entirely. The first updater-enabled release remains a one-time manual upgrade from 0.4.0 because the published 0.4.0 app has no updater.
 
 ## Privacy and diagnostics
 
