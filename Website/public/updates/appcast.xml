@@ -1,9 +1,18 @@
-<?xml version="1.0" encoding="utf-8"?>
-<rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle">
-  <channel>
-    <title>EyeOh Updates</title>
-    <link>https://eyeoh.app/</link>
-    <description>Signed direct-download updates for EyeOh.</description>
-    <language>en-au</language>
-  </channel>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" version="2.0">
+    <channel>
+        <title>EyeOh Updates</title>
+        <link>https://eyeoh.app/</link>
+        <description>Signed direct-download updates for EyeOh.</description>
+        <language>en-au</language>
+        <item>
+            <title>0.4.1</title>
+            <pubDate>Tue, 18 Aug 2026 23:02:03 +1000</pubDate>
+            <link>https://eyeoh.app/</link>
+            <sparkle:version>7</sparkle:version>
+            <sparkle:shortVersionString>0.4.1</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
+            <enclosure url="https://eyeoh.app/updates/EyeOh-0.4.1-7.zip" length="3781716" type="application/octet-stream" sparkle:edSignature="EY15ieUWonwfPZvQbTiTE5oPKEZ5XOBVX9l5DoOYeXYYOKdWfvy6wl49UPLeRh+MPfTYMzg/caMgurWroR0QBA=="/>
+        </item>
+    </channel>
 </rss>
