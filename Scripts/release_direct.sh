@@ -32,6 +32,7 @@ fi
 SIGNING_MODE=developer-id \
 APP_IDENTITY="$APP_IDENTITY" \
 APP_ENTITLEMENTS="$PROJECT_ROOT/Config/EyeOh-Direct.entitlements" \
+APP_BUILD_ROOT="$PROJECT_ROOT/build/direct" \
 ARCHES="arm64 x86_64" \
 DISTRIBUTION_CHANNEL="${DISTRIBUTION_CHANNEL:-direct}" \
 POSTHOG_PROJECT_TOKEN="${POSTHOG_PROJECT_TOKEN:-}" \
@@ -39,11 +40,11 @@ POSTHOG_HOST="${POSTHOG_HOST:-}" \
 SENTRY_DSN="${SENTRY_DSN:-}" \
 "$PROJECT_ROOT/Scripts/package_app.sh" release
 
-APP_BUNDLE="$PROJECT_ROOT/build/EyeOh.app"
-DSYM_BUNDLE="$PROJECT_ROOT/build/EyeOh.app.dSYM"
+APP_BUNDLE="$PROJECT_ROOT/build/direct/EyeOh.app"
+DSYM_BUNDLE="$PROJECT_ROOT/build/direct/EyeOh.app.dSYM"
 DIST_DIR="$PROJECT_ROOT/dist"
-ARCHIVE="$DIST_DIR/EyeOh-$MARKETING_VERSION.zip"
-DISK_IMAGE="$DIST_DIR/EyeOh-$MARKETING_VERSION.dmg"
+ARCHIVE="$DIST_DIR/EyeOh-$MARKETING_VERSION-$BUILD_NUMBER.zip"
+DISK_IMAGE="$DIST_DIR/EyeOh-$MARKETING_VERSION-$BUILD_NUMBER.dmg"
 mkdir -p "$DIST_DIR"
 rm -f "$ARCHIVE"
 ditto -c -k --keepParent --norsrc --noextattr --noqtn --noacl "$APP_BUNDLE" "$ARCHIVE"
@@ -86,6 +87,7 @@ if [[ "$NOTARIZE" == "1" ]]; then
     mkdir -p "$PROJECT_ROOT/Website/public/downloads"
     cp "$ARCHIVE" "$PROJECT_ROOT/Website/public/downloads/EyeOh.zip"
     cp "$DISK_IMAGE" "$PROJECT_ROOT/Website/public/downloads/EyeOh.dmg"
+    "$PROJECT_ROOT/Scripts/prepare_appcast.sh" "$ARCHIVE"
     echo "Notarized website downloads created at Website/public/downloads/EyeOh.dmg and EyeOh.zip"
 else
     "$PROJECT_ROOT/Scripts/create_dmg.sh" "$APP_BUNDLE" "$DISK_IMAGE"

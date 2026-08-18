@@ -21,6 +21,21 @@ if ! grep -Fq "NSBluetoothAlwaysUsageDescription" "$PROJECT_ROOT/Scripts/package
     exit 1
 fi
 
+if ! grep -Fq 'exact: "2.9.5"' "$PROJECT_ROOT/Package.swift"; then
+    echo "Direct updater is not pinned to the reviewed Sparkle release." >&2
+    exit 1
+fi
+
+if ! grep -Fq 'DISTRIBUTION_CHANNEL=mas' "$PROJECT_ROOT/Scripts/build_mas_candidate.sh"; then
+    echo "MAS channel build script is missing." >&2
+    exit 1
+fi
+
+if ! grep -Fq 'SPARKLE_FEED_URL=https://eyeoh.app/updates/appcast.xml' "$PROJECT_ROOT/Config/EyeOh-Update.conf"; then
+    echo "Sparkle feed URL is missing or unexpected." >&2
+    exit 1
+fi
+
 for ENTITLEMENTS in \
     "$PROJECT_ROOT/Config/EyeOh-Direct.entitlements" \
     "$PROJECT_ROOT/Config/EyeOh-MAS.entitlements"; do

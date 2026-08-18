@@ -7,7 +7,8 @@ EyeOh is a menu-bar utility for choosing macOS audio defaults, reconnecting a pr
 - **App Sandbox** — required for Mac App Store distribution.
 - **Camera** (`com.apple.security.device.camera`) — used only after the reviewer chooses **Preview Preferred Camera…**. The local `AVCaptureSession` stops with the preview window and no frames are saved, analysed, or transmitted.
 - **Bluetooth** (`com.apple.security.device.bluetooth`) — used only after the reviewer clicks a dimmed **Device Name · Connect** shortcut for a previously seen, paired Bluetooth audio route. EyeOh calls the public `IOBluetoothDevice.openConnection(_:)` API, waits for Core Audio to publish the route, selects only the requested input or output, and restores its local volume preset. It does not scan for arbitrary devices, pair anything, or connect automatically.
-- **Outgoing network client** (`com.apple.security.network.client`) — reserved for the separately controlled usage-statistics and crash-reporting switches in Settings. Source and unconfigured builds keep both providers unavailable. Official configured builds send only the fixed, documented schemas over HTTPS; EyeOh has no account, advertising, tracking, or remote content.
+
+The initial free Mac App Store candidate does not request outgoing-network access. Its optional statistics and crash-reporting providers are unconfigured and unavailable, its privacy manifest declares no collected data, and App Store updates are performed by the App Store rather than the app. A later network-enabled submission would require an updated entitlement set, privacy manifest, App Privacy answers and review notes.
 
 EyeOh deliberately does **not** request an audio-input or microphone entitlement because it never captures microphone samples. Core Audio default-device selection does not require microphone recording access.
 
