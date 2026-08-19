@@ -1,0 +1,59 @@
+---
+// Mac App Store badge - toggled by SHOW_MAS flag
+// Flip to true when App Store approval lands and add real URL
+
+const SHOW_MAS = false;
+const MAS_STORE_URL = "https://apps.apple.com/app/eyeoh/"; // Update with real App Store URL when available
+
+if (!SHOW_MAS) {
+  // Component not rendered if flag is false
+}
+---
+
+{SHOW_MAS && (
+  <a
+    href={MAS_STORE_URL}
+    class="mas-badge"
+    aria-label="Download EyeOh on the Mac App Store"
+  >
+    <svg viewBox="0 0 1000 333" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <!-- Mac App Store badge background -->
+      <rect x="0" y="0" width="1000" height="333" rx="48" fill="#000000"/>
+
+      <!-- Apple logo -->
+      <path d="M 81 139 C 81 105 101 79 134 79 C 161 79 177 94 188 109 L 188 109 L 166 127 C 159 115 151 107 134 107 C 114 107 101 121 101 139 C 101 157 114 171 134 171 C 151 171 159 163 166 151 L 188 169 C 177 184 161 199 134 199 C 101 199 81 173 81 139 Z M 251 110 L 251 198 L 231 198 L 231 110 L 251 110 M 241 83 C 248 83 254 89 254 96 C 254 103 248 109 241 109 C 234 109 228 103 228 96 C 228 89 234 83 241 83 Z M 318 165 L 318 198 L 298 198 L 298 78 L 340 78 C 372 78 389 95 389 128 C 389 160 372 177 340 177 L 318 177 L 318 165 Z M 318 106 L 318 150 L 340 150 C 360 150 369 142 369 128 C 369 114 360 106 340 106 L 318 106 Z M 442 165 L 442 198 L 422 198 L 422 78 L 464 78 C 496 78 513 95 513 128 C 513 160 496 177 464 177 L 442 177 L 442 165 Z M 442 106 L 442 150 L 464 150 C 484 150 493 142 493 128 C 493 114 484 106 464 106 L 442 106 Z M 563 194 L 563 198 L 527 198 L 527 78 L 563 78 L 563 82 L 547 82 L 547 134 L 562 134 L 562 138 L 547 138 L 547 194 L 563 194 Z M 630 165 L 630 198 L 610 198 L 610 165 L 580 78 L 602 78 L 622 144 L 642 78 L 664 78 L 630 165 Z" fill="#FFFFFF"/>
+
+      <!-- "App Store" text -->
+      <text x="720" y="140" font-family="system-ui, -apple-system, BlinkMacSystemFont, San Francisco, Segoe UI, Roboto, Helvetica Neue, sans-serif" font-size="72" font-weight="600" fill="#FFFFFF" text-anchor="middle">
+        App Store
+      </text>
+      <text x="720" y="190" font-family="system-ui, -apple-system, BlinkMacSystemFont, San Francisco, Segoe UI, Roboto, Helvetica Neue, sans-serif" font-size="40" fill="#FFFFFF" opacity="0.8" text-anchor="middle">
+        Download on the
+      </text>
+    </svg>
+  </a>
+)}
+
+<style>
+.mas-badge {
+  display: inline-block;
+  max-width: 280px;
+  margin-top: 16px;
+  text-decoration: none;
+}
+
+.mas-badge svg {
+  width: 100%;
+  height: auto;
+  display: block;
+  transition: opacity 200ms ease-out;
+}
+
+.mas-badge:hover svg {
+  opacity: 0.9;
+}
+
+.mas-badge:active svg {
+  opacity: 0.8;
+}
+</style>

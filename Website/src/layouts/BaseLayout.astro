@@ -17,7 +17,7 @@ const downloadURL = import.meta.env.PUBLIC_DOWNLOAD_URL ?? '/downloads/EyeOh.dmg
 <html lang="en-AU">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
     <meta id="theme-colour" name="theme-color" content="#f5f8fa" />
     <meta property="og:type" content="website" />
@@ -26,6 +26,8 @@ const downloadURL = import.meta.env.PUBLIC_DOWNLOAD_URL ?? '/downloads/EyeOh.dmg
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
     <meta property="og:image" content={socialImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
     <meta name="twitter:card" content="summary_large_image" />
     <link rel="canonical" href={canonical} />
     <link rel="icon" href={logo.src} type="image/svg+xml" />
@@ -37,8 +39,8 @@ const downloadURL = import.meta.env.PUBLIC_DOWNLOAD_URL ?? '/downloads/EyeOh.dmg
     <a class="skip-link" href="#main">Skip to main content</a>
     <header class="site-header">
       <div class="container header-inner">
-        <a class="brand" href="/" aria-label="EyeOh home">
-          <img src={logo.src} width="34" height="34" alt="" />
+        <a class="brand" href="/">
+          <img src={logo.src} width="34" height="34" alt="EyeOh home" />
           <span class="brand-lockup"><strong>EyeOh</strong><small>by Dark Ice</small></span>
         </a>
         <nav aria-label="Main navigation">
@@ -62,7 +64,7 @@ const downloadURL = import.meta.env.PUBLIC_DOWNLOAD_URL ?? '/downloads/EyeOh.dmg
     <footer>
       <div class="container footer-inner">
         <a class="brand footer-brand" href="/">
-          <img src={logo.src} width="28" height="28" alt="" />
+          <img src={logo.src} width="28" height="28" alt="" aria-hidden="true" />
           <span class="brand-lockup"><strong>EyeOh</strong><small>by Dark Ice</small></span>
         </a>
         <p>Built by Dark Ice Interactive. No account. The current download sends no EyeOh diagnostics.</p>
