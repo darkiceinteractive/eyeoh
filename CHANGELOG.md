@@ -4,6 +4,19 @@ All notable changes will be recorded here. The project follows semantic versioni
 
 ## Unreleased
 
+### Added
+
+- Mic Lock and device priority: rank your inputs and outputs and EyeOh keeps the highest ranked connected device active (off by default).
+- Global Mute Microphone control in the menu, with a muted indicator in the menu bar. Mute only undoes its own changes.
+- Optional global keyboard shortcuts (Settings > Shortcuts) to mute the mic, cycle input or output, and open the menu.
+- Keep my camera selected: EyeOh restores your chosen camera after restart, wake, or when an iPhone camera appears. Apps with their own camera setting, such as Zoom and Teams, still override this.
+- Menu warns when the active input is muted or at zero volume, with a one-click fix.
+
+### Fixed
+
+- Input going stale or silent after Bluetooth headsets connect or disconnect. EyeOh now follows stream changes and repairs a default input that has no usable stream.
+- Reconnecting a Bluetooth device no longer restores outdated device IDs.
+
 ## 0.4.1 - 2026-08-18
 
 - Add Sparkle automatic updates to the direct-download edition, with signed update archives and an appcast published at eyeoh.app.

@@ -26,6 +26,7 @@ struct EyeOhApp: App {
         Diagnostics.record(.appLaunched)
         let micMute = MicMuteController(client: CoreAudioMicMuteClient())
         micMute.startMonitoring()
+        store.globalMuteSource = { micMute.isGlobalMuteActive }
         let hotkeyPreferences = HotkeyPreferences()
         let hotkeyCenter = HotkeyCenter(preferences: hotkeyPreferences)
         let coordinator = ShortcutCoordinator(store: store, micMute: micMute)

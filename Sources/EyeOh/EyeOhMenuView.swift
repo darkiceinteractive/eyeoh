@@ -26,8 +26,6 @@ struct EyeOhMenuView: View {
                         inputVolumeControl
                     }
 
-                    inputSilenceBanner
-
                     routeSection(
                         title: "Input",
                         systemImage: "mic",
@@ -170,31 +168,6 @@ struct EyeOhMenuView: View {
             )
         } else if let device = store.selectedDevice {
             unavailableVolumeCard(title: "Input volume", deviceName: device.name, systemImage: "mic.slash")
-        }
-    }
-
-    @ViewBuilder
-    private var inputSilenceBanner: some View {
-        if let silence = store.inputSilence, let device = store.selectedDevice {
-            Button { store.unmuteSelectedInput() } label: {
-                HStack(spacing: 9) {
-                    Image(systemName: "mic.slash.fill").foregroundStyle(.orange)
-                    VStack(alignment: .leading, spacing: 1) {
-                        Text(silence == .muted ? "Input muted, click to unmute" : "Input volume is 0, click to restore")
-                            .font(.subheadline.weight(.semibold))
-                        Text(compactMenuName(device.name))
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                            .lineLimit(1)
-                    }
-                    Spacer()
-                }
-                .padding(12)
-                .background(.orange.opacity(0.14), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
-                .contentShape(Rectangle())
-            }
-            .buttonStyle(.plain)
-            .accessibilityLabel(silence == .muted ? "Input muted. Unmute" : "Input volume zero. Restore volume")
         }
     }
 

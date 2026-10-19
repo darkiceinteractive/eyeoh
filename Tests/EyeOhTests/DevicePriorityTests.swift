@@ -314,7 +314,7 @@ final class PriorityLockStoreTests: XCTestCase {
         controller.muted = [builtIn.id]
         let store = makeStore(controller: controller)
         store.clearsStaleMuteOnSwitch = true
-        store.globalMuteActive = true
+        store.globalMuteSource = { true }
 
         store.select(builtIn)
 

@@ -42,8 +42,10 @@ final class AudioDeviceStore {
             if locksOutput { enforceOutputPriority() }
         }
     }
-    /// Set by the global mic mute feature while it is deliberately muting input.
-    var globalMuteActive = false
+    /// Reads `MicMuteController.isGlobalMuteActive`, the single source of truth for
+    /// "EyeOh itself muted the microphone". Not stored here so the two cannot drift.
+    @ObservationIgnored var globalMuteSource: @MainActor () -> Bool = { false }
+    var globalMuteActive: Bool { globalMuteSource() }
     var clearsStaleMuteOnSwitch: Bool {
         didSet { priorityPreferences.clearsStaleMuteOnSwitch = clearsStaleMuteOnSwitch }
     }
