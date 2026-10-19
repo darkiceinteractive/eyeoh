@@ -24,4 +24,5 @@ struct CameraDevice: Identifiable, Equatable, Sendable {
     let id: String
     let name: String
     let kind: Kind
+    var modelID: String?
 }

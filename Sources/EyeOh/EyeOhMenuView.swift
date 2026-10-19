@@ -67,6 +67,13 @@ struct EyeOhMenuView: View {
                         }
                         .buttonStyle(.plain)
                         .disabled(cameraStore.selectedCamera == nil)
+
+                        if let hint = cameraStore.holdHint {
+                            Text(hint)
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                                .padding(.horizontal, 10)
+                        }
                     }
 
                     if let errorMessage = store.errorMessage {

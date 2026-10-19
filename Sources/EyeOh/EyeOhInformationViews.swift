@@ -28,6 +28,11 @@ struct EyeOhHelpView: View {
                     text: "Choose a camera, then open Preview Preferred Camera. EyeOh asks for camera access only for this local preview and never records it."
                 )
                 helpItem(
+                    icon: "lock",
+                    title: "Keep my camera selected",
+                    text: "macOS forgets your preferred camera after a restart and may switch to an iPhone when it appears. EyeOh remembers your pick and restores it when it is connected. This only affects apps that follow the system preferred camera, such as FaceTime and Safari. Apps that choose their own camera in their settings, such as Zoom and Teams, still override it."
+                )
+                helpItem(
                     icon: "waveform.path",
                     title: "Virtual devices",
                     text: "EyeOh shows usable Core Audio routes. Private meeting-app endpoints are hidden; installed virtual drivers can appear when macOS allows them as a default."
