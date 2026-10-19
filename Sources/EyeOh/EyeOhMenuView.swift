@@ -10,6 +10,7 @@ struct EyeOhMenuView: View {
     let cameraStore: CameraDeviceStore
     let preferences: AppPreferences
     let softwareUpdater: SoftwareUpdateController
+    let micMute: MicMuteController
 
     var body: some View {
         VStack(spacing: 0) {
@@ -17,6 +18,8 @@ struct EyeOhMenuView: View {
 
             ScrollView {
                 VStack(spacing: 14) {
+                    MicMuteMenuRow(micMute: micMute)
+
                     outputVolumeControl
 
                     if preferences.showsInputVolumeInMenu {
@@ -99,6 +102,7 @@ struct EyeOhMenuView: View {
             // Volume may have changed in Sound Settings while the panel was closed.
             store.refresh()
             cameraStore.refresh()
+            micMute.refresh()
         }
     }
 
