@@ -29,7 +29,10 @@ struct ShortcutsSettingsView: View {
             } header: {
                 Text("Global shortcuts")
             } footer: {
-                Text("Click a field, then press a shortcut that includes ⌘, ⌃ or ⌥. Press Delete to clear it, or Esc to cancel. Shortcuts work in any app and are off until you set them.")
+                VStack(alignment: .leading, spacing: 6) {
+                    Text("Click a field, then press a shortcut that includes ⌘, ⌃ or ⌥. Press Delete to clear it, or Esc to cancel. Shortcuts work in any app and are off until you set them.")
+                    Text("Your Mac's keyboard mute key still controls speaker mute. EyeOh's microphone mute is separate.")
+                }
             }
         }
         .formStyle(.grouped)
@@ -42,6 +45,8 @@ struct ShortcutsSettingsView: View {
             break
         case .invalid:
             messages[action] = "Include ⌘, ⌃ or ⌥ so normal typing isn't captured."
+        case .reserved(let owner):
+            messages[action] = "Not set: this is used by \(owner). Choose a different shortcut."
         case .conflict(let other):
             messages[action] = "Already used for \"\(other.title)\"."
         }

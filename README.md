@@ -64,6 +64,8 @@ PostHog uses a small first-party HTTPS reporter rather than its general mobile S
 
 ## Contributing
 
+The source lives at https://github.com/darkiceinteractive/eyeoh.
+
 See `CONTRIBUTING.md` for the development workflow and `SECURITY.md` for responsible vulnerability reporting. External code contributions require acceptance of `CONTRIBUTOR_LICENSE_AGREEMENT.md` before they can be merged.
 
 ## Licensing and editions

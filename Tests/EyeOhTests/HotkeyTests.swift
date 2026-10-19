@@ -77,7 +77,7 @@ final class HotkeyTests: XCTestCase {
         let preferences = HotkeyPreferences(defaults: defaults)
         var calls = 0
         preferences.onChange = { calls += 1 }
-        preferences.set(HotkeyBinding(keyCode: 1, modifiers: UInt32(cmdKey)), for: .openMenu)
+        preferences.set(HotkeyBinding(keyCode: UInt32(kVK_ANSI_J), modifiers: UInt32(controlKey | optionKey)), for: .openMenu)
         preferences.set(nil, for: .openMenu)
         XCTAssertEqual(calls, 2)
     }
@@ -95,6 +95,33 @@ final class HotkeyTests: XCTestCase {
         XCTAssertNil(DeviceCycler.next(in: [], after: 1))
         XCTAssertNil(DeviceCycler.next(in: [device(1)], after: 1))
         XCTAssertEqual(DeviceCycler.next(in: [device(1)], after: 5)?.id, 1)
+    }
+
+    func testReservedSystemShortcutsAreRejectedAndNotStored() {
+        let (defaults, cleanup) = makeDefaults()
+        defer { cleanup() }
+        let preferences = HotkeyPreferences(defaults: defaults, systemGuard: SystemShortcutGuard(systemBindings: []))
+        let spotlight = HotkeyBinding(keyCode: UInt32(kVK_Space), modifiers: UInt32(cmdKey))
+        XCTAssertEqual(preferences.set(spotlight, for: .openMenu), .reserved("Spotlight"))
+        XCTAssertNil(preferences.binding(for: .openMenu))
+        for (key, mods) in [(kVK_Tab, cmdKey), (kVK_ANSI_Q, cmdKey), (kVK_ANSI_W, cmdKey),
+                            (kVK_ANSI_H, cmdKey), (kVK_ANSI_M, cmdKey), (kVK_UpArrow, controlKey),
+                            (kVK_DownArrow, controlKey)] {
+            let binding = HotkeyBinding(keyCode: UInt32(key), modifiers: UInt32(mods))
+            guard case .reserved = preferences.set(binding, for: .openMenu) else {
+                return XCTFail("\(binding.displayString) should be reserved")
+            }
+        }
+    }
+
+    func testSymbolicHotKeysFromSystemPreferencesAreRejected() {
+        let (defaults, cleanup) = makeDefaults()
+        defer { cleanup() }
+        let custom = HotkeyBinding(keyCode: UInt32(kVK_ANSI_J), modifiers: UInt32(controlKey | optionKey))
+        let guardWithSystem = SystemShortcutGuard(systemBindings: [(custom, "a macOS system shortcut")])
+        let preferences = HotkeyPreferences(defaults: defaults, systemGuard: guardWithSystem)
+        XCTAssertEqual(preferences.set(custom, for: .nextInput), .reserved("a macOS system shortcut"))
+        XCTAssertNil(preferences.binding(for: .nextInput))
     }
 }
 

@@ -78,6 +78,7 @@ enum HotkeyAssignmentResult: Equatable {
     case assigned
     case invalid
     case conflict(HotkeyAction)
+    case reserved(String)
 }
 
 /// Shortcuts are all unset by default and persist as JSON per action in UserDefaults.
@@ -85,11 +86,13 @@ enum HotkeyAssignmentResult: Equatable {
 @Observable
 final class HotkeyPreferences {
     private let defaults: UserDefaults
+    private let systemGuard: SystemShortcutGuard
     private(set) var bindings: [HotkeyAction: HotkeyBinding] = [:]
     @ObservationIgnored var onChange: (() -> Void)?
 
-    init(defaults: UserDefaults = .standard) {
+    init(defaults: UserDefaults = .standard, systemGuard: SystemShortcutGuard = SystemShortcutGuard()) {
         self.defaults = defaults
+        self.systemGuard = systemGuard
         for action in HotkeyAction.allCases {
             guard let data = defaults.data(forKey: action.preferenceKey),
                   let binding = try? JSONDecoder().decode(HotkeyBinding.self, from: data),
@@ -113,6 +116,7 @@ final class HotkeyPreferences {
             return .assigned
         }
         guard binding.isValid else { return .invalid }
+        if let owner = systemGuard.conflict(for: binding) { return .reserved(owner) }
         if let other = bindings.first(where: { $0.key != action && $0.value == binding })?.key {
             return .conflict(other)
         }
