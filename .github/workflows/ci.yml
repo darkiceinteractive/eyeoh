@@ -1,10 +1,17 @@
 name: CI
 
 on:
+  push:
+    branches: [main]
+  pull_request:
   workflow_dispatch:
 
 permissions:
   contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   source-validation:
@@ -27,3 +34,20 @@ jobs:
         run: brew install shellcheck
       - name: Lint shell scripts
         run: shellcheck Scripts/*.sh run-menubar.sh stop-menubar.sh
+
+  website-build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: Website
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: Website/package-lock.json
+      - name: Install dependencies
+        run: npm ci
+      - name: Type-check and build
+        run: npm run build

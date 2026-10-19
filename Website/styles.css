@@ -421,3 +421,7 @@ footer { border-top: 1px solid var(--border); }
     transition-duration: 0.01ms !important;
   }
 }
+
+.changelog h2#unreleased {
+  display: none;
+}
