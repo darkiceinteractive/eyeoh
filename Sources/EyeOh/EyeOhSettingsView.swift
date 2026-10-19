@@ -130,6 +130,14 @@ private struct GeneralSettingsView: View {
             }
 
             Section {
+                Toggle("Keep my camera selected", isOn: Binding(get: { cameraStore.holdsSelection }, set: { cameraStore.holdsSelection = $0 }))
+            } header: {
+                Text("Camera")
+            } footer: {
+                Text("Restores your chosen camera after a restart, wake, or when an iPhone camera appears. Apps that choose their own camera, such as Zoom or Teams, still override this.")
+            }
+
+            Section {
                 Toggle("Show input volume in menu bar", isOn: $preferences.showsInputVolumeInMenu)
                 Toggle("Clear stale mute when switching input", isOn: $store.clearsStaleMuteOnSwitch)
             } header: {
