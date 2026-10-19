@@ -9,7 +9,15 @@ final class AudioDeviceStore {
     private let volumePresets: DeviceVolumePresets
     private let bluetoothConnector: any BluetoothDeviceConnecting
     private let rememberedBluetoothDevices: RememberedBluetoothDevices
+    private let priorityPreferences: DevicePriorityPreferences
+    private let now: @MainActor () -> Date
+    private let settleDelay: Duration
     private var monitorTask: Task<Void, Never>?
+    private var settleTask: Task<Void, Never>?
+    private var inputBackoff = ReassertBackoff()
+    private var outputBackoff = ReassertBackoff()
+    private var lastHealthyInputUID: String?
+    private var lastHealthyOutputUID: String?
 
     private(set) var devices: [AudioDevice] = []
     private(set) var selectedDeviceID: AudioDeviceID?
@@ -20,6 +28,25 @@ final class AudioDeviceStore {
     private(set) var rememberedBluetoothDeviceCount = 0
     private(set) var connectingBluetoothAddress: String?
     private(set) var errorMessage: String?
+    private(set) var inputPriority: [PriorityEntry]
+    private(set) var outputPriority: [PriorityEntry]
+    var locksInput: Bool {
+        didSet {
+            priorityPreferences.setLocks(locksInput, for: .input)
+            if locksInput { enforceInputPriority() }
+        }
+    }
+    var locksOutput: Bool {
+        didSet {
+            priorityPreferences.setLocks(locksOutput, for: .output)
+            if locksOutput { enforceOutputPriority() }
+        }
+    }
+    /// Set by the global mic mute feature while it is deliberately muting input.
+    var globalMuteActive = false
+    var clearsStaleMuteOnSwitch: Bool {
+        didSet { priorityPreferences.clearsStaleMuteOnSwitch = clearsStaleMuteOnSwitch }
+    }
     var showsDisconnectedBluetoothDevices: Bool {
         didSet {
             rememberedBluetoothDevices.showsDisconnectedDevices = showsDisconnectedBluetoothDevices
@@ -31,12 +58,23 @@ final class AudioDeviceStore {
         controller: any AudioDeviceControlling,
         volumePresets: DeviceVolumePresets = DeviceVolumePresets(),
         bluetoothConnector: any BluetoothDeviceConnecting = IOBluetoothClient(),
-        rememberedBluetoothDevices: RememberedBluetoothDevices = RememberedBluetoothDevices()
+        rememberedBluetoothDevices: RememberedBluetoothDevices = RememberedBluetoothDevices(),
+        priorityPreferences: DevicePriorityPreferences = DevicePriorityPreferences(),
+        now: @escaping @MainActor () -> Date = { Date() },
+        settleDelay: Duration = .milliseconds(900)
     ) {
         self.controller = controller
         self.volumePresets = volumePresets
         self.bluetoothConnector = bluetoothConnector
         self.rememberedBluetoothDevices = rememberedBluetoothDevices
+        self.priorityPreferences = priorityPreferences
+        self.now = now
+        self.settleDelay = settleDelay
+        inputPriority = priorityPreferences.entries(for: .input)
+        outputPriority = priorityPreferences.entries(for: .output)
+        locksInput = priorityPreferences.locks(.input)
+        locksOutput = priorityPreferences.locks(.output)
+        clearsStaleMuteOnSwitch = priorityPreferences.clearsStaleMuteOnSwitch
         showsDisconnectedBluetoothDevices = rememberedBluetoothDevices.showsDisconnectedDevices
         refresh()
     }
@@ -47,6 +85,36 @@ final class AudioDeviceStore {
 
     var selectedOutputDevice: AudioDevice? {
         outputDevices.first { $0.id == selectedOutputDeviceID }
+    }
+
+    enum InputSilence: Equatable {
+        case muted
+        case zeroVolume
+    }
+
+    /// Why the active input would record silence. EyeOh never clears this by
+    /// itself unless the user opted in; another app may have muted it on purpose.
+    var inputSilence: InputSilence? {
+        guard let device = selectedDevice else { return nil }
+        if device.isMuted == true { return .muted }
+        if device.isVolumeSettable, let volume = device.volume, volume <= 0 { return .zeroVolume }
+        return nil
+    }
+
+    func unmuteSelectedInput() {
+        guard let device = selectedDevice else { return }
+        do {
+            if device.isMuted == true {
+                try controller.setInputMute(false, for: device.id)
+            }
+            if device.isVolumeSettable, let volume = device.volume, volume <= 0 {
+                let saved = volumePresets.value(for: device.uid, direction: .input) ?? 0
+                try controller.setInputVolume(saved > 0 ? saved : 0.75, for: device.id)
+            }
+            refresh()
+        } catch {
+            errorMessage = error.localizedDescription
+        }
     }
 
     var menuBarTitle: String {
@@ -66,7 +134,169 @@ final class AudioDeviceStore {
             for await _ in changes {
                 guard !Task.isCancelled else { break }
                 self?.refresh()
+                self?.scheduleSettle()
             }
+        }
+        scheduleSettle()
+    }
+
+    /// Bluetooth devices announce themselves before their input stream is usable,
+    /// and macOS may change defaults several times while a profile switches. Act
+    /// only once the notifications have been quiet for `settleDelay`.
+    private func scheduleSettle() {
+        settleTask?.cancel()
+        settleTask = Task { [weak self, settleDelay] in
+            try? await Task.sleep(for: settleDelay)
+            guard !Task.isCancelled else { return }
+            self?.settle()
+        }
+    }
+
+    private func clearStaleMuteAfterSwitch(to device: AudioDevice) {
+        guard clearsStaleMuteOnSwitch, !globalMuteActive,
+              selectedDevice?.id == device.id, selectedDevice?.isMuted == true
+        else { return }
+        do {
+            try controller.setInputMute(false, for: device.id)
+            refresh()
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
+
+    func settle() {
+        refresh()
+        repairUnusableDefaults()
+        enforceInputPriority()
+        enforceOutputPriority()
+    }
+
+    enum LockStatus: Equatable {
+        case off
+        case active
+        case paused
+    }
+
+    var inputLockStatus: LockStatus {
+        lockStatus(locks: locksInput, backoff: inputBackoff)
+    }
+
+    var outputLockStatus: LockStatus {
+        lockStatus(locks: locksOutput, backoff: outputBackoff)
+    }
+
+    private func lockStatus(locks: Bool, backoff: ReassertBackoff) -> LockStatus {
+        guard locks else { return .off }
+        return backoff.isPaused(at: now()) ? .paused : .active
+    }
+
+    func priority(for direction: DeviceVolumePresets.Direction) -> [PriorityEntry] {
+        direction == .input ? inputPriority : outputPriority
+    }
+
+    func isConnected(_ entry: PriorityEntry, direction: DeviceVolumePresets.Direction) -> Bool {
+        let live = direction == .input ? devices : outputDevices
+        return live.contains { $0.uid == entry.uid }
+    }
+
+    func addToPriority(_ device: AudioDevice, direction: DeviceVolumePresets.Direction) {
+        addToPriority(PriorityEntry(uid: device.uid, name: device.name), direction: direction)
+    }
+
+    func addToPriority(_ entry: PriorityEntry, direction: DeviceVolumePresets.Direction) {
+        var list = priority(for: direction)
+        guard !list.contains(where: { $0.uid == entry.uid }) else { return }
+        list.append(entry)
+        setPriority(list, direction: direction)
+    }
+
+    func removeFromPriority(uid: String, direction: DeviceVolumePresets.Direction) {
+        setPriority(priority(for: direction).filter { $0.uid != uid }, direction: direction)
+    }
+
+    func movePriority(from source: IndexSet, to destination: Int, direction: DeviceVolumePresets.Direction) {
+        var list = priority(for: direction)
+        let moving = source.sorted().map { list[$0] }
+        let adjusted = destination - source.filter { $0 < destination }.count
+        for index in source.sorted(by: >) { list.remove(at: index) }
+        list.insert(contentsOf: moving, at: min(max(adjusted, 0), list.count))
+        setPriority(list, direction: direction)
+    }
+
+    private func setPriority(_ list: [PriorityEntry], direction: DeviceVolumePresets.Direction) {
+        switch direction {
+        case .input:
+            inputPriority = list
+            priorityPreferences.setEntries(list, for: .input)
+            enforceInputPriority()
+        case .output:
+            outputPriority = list
+            priorityPreferences.setEntries(list, for: .output)
+            enforceOutputPriority()
+        }
+    }
+
+    /// A pick made in EyeOh's own menu is the user's newest intent, so while a
+    /// lock is on it becomes the top-ranked device instead of being undone.
+    private func promoteManualPick(_ device: AudioDevice, direction: DeviceVolumePresets.Direction) {
+        let locked = direction == .input ? locksInput : locksOutput
+        guard locked else { return }
+        let promoted = DevicePriorityResolver.promoting(
+            PriorityEntry(uid: device.uid, name: device.name),
+            in: priority(for: direction)
+        )
+        switch direction {
+        case .input:
+            inputPriority = promoted
+            priorityPreferences.setEntries(promoted, for: .input)
+        case .output:
+            outputPriority = promoted
+            priorityPreferences.setEntries(promoted, for: .output)
+        }
+    }
+
+    private func enforceInputPriority() {
+        guard locksInput,
+              let preferred = DevicePriorityResolver.preferred(in: inputPriority, available: devices),
+              DevicePriorityResolver.isHijacked(currentID: selectedDeviceID, preferred: preferred),
+              inputBackoff.requestReassert(at: now())
+        else { return }
+        applyInput(preferred)
+    }
+
+    private func enforceOutputPriority() {
+        guard locksOutput,
+              let preferred = DevicePriorityResolver.preferred(in: outputPriority, available: outputDevices),
+              DevicePriorityResolver.isHijacked(currentID: selectedOutputDeviceID, preferred: preferred),
+              outputBackoff.requestReassert(at: now())
+        else { return }
+        applyOutput(preferred)
+    }
+
+    /// The system can leave a default pointing at a device that has no usable
+    /// stream (an AirPods input that has not switched to the call profile yet, or
+    /// one that has vanished). Re-point it at something that works, which is what
+    /// toggling the device in System Settings does by hand.
+    private func repairUnusableDefaults() {
+        if !devices.isEmpty,
+           !devices.contains(where: { $0.id == selectedDeviceID }),
+           let target = DevicePriorityResolver.fallback(
+               priority: locksInput ? inputPriority : [],
+               available: devices,
+               lastHealthyUID: lastHealthyInputUID
+           ),
+           inputBackoff.requestReassert(at: now()) {
+            applyInput(target)
+        }
+        if !outputDevices.isEmpty,
+           !outputDevices.contains(where: { $0.id == selectedOutputDeviceID }),
+           let target = DevicePriorityResolver.fallback(
+               priority: locksOutput ? outputPriority : [],
+               available: outputDevices,
+               lastHealthyUID: lastHealthyOutputUID
+           ),
+           outputBackoff.requestReassert(at: now()) {
+            applyOutput(target)
         }
     }
 
@@ -81,6 +311,12 @@ final class AudioDeviceStore {
             outputDevices = refreshedOutputs
             selectedDeviceID = refreshedInputID
             selectedOutputDeviceID = refreshedOutputID
+            if let healthy = refreshedInputs.first(where: { $0.id == refreshedInputID }) {
+                lastHealthyInputUID = healthy.uid
+            }
+            if let healthy = refreshedOutputs.first(where: { $0.id == refreshedOutputID }) {
+                lastHealthyOutputUID = healthy.uid
+            }
             refreshedInputs.forEach {
                 rememberedBluetoothDevices.remember($0, direction: .input)
             }
@@ -95,6 +331,11 @@ final class AudioDeviceStore {
     }
 
     func select(_ device: AudioDevice) {
+        promoteManualPick(device, direction: .input)
+        applyInput(device)
+    }
+
+    private func applyInput(_ device: AudioDevice) {
         guard device.id != selectedDeviceID else { return }
         do {
             rememberCurrentInputVolume()
@@ -109,6 +350,7 @@ final class AudioDeviceStore {
                 }
             }
             refresh()
+            clearStaleMuteAfterSwitch(to: device)
             Diagnostics.record(.inputChanged)
             if let presetError {
                 errorMessage = "Input switched, but its saved volume could not be restored: \(presetError.localizedDescription)"
@@ -119,6 +361,11 @@ final class AudioDeviceStore {
     }
 
     func selectOutput(_ device: AudioDevice) {
+        promoteManualPick(device, direction: .output)
+        applyOutput(device)
+    }
+
+    private func applyOutput(_ device: AudioDevice) {
         guard device.id != selectedOutputDeviceID else { return }
         do {
             rememberCurrentOutputVolume()
@@ -202,9 +449,12 @@ final class AudioDeviceStore {
         direction: DeviceVolumePresets.Direction
     ) async {
         guard connectingBluetoothAddress == nil else { return }
-        let previousInputID = try? controller.defaultInputDeviceID()
-        let previousOutputID = try? controller.defaultOutputDeviceID()
-        let previousSystemOutputID = try? controller.defaultSystemOutputDeviceID()
+        // Device IDs change when a Bluetooth device reconnects, so remember the
+        // UIDs and resolve them to current IDs only when restoring.
+        let previousInputUID = devices.first { $0.id == selectedDeviceID }?.uid
+        let previousOutputUID = outputDevices.first { $0.id == selectedOutputDeviceID }?.uid
+        let previousSystemOutputUID = (try? controller.defaultSystemOutputDeviceID())
+            .flatMap { id in outputDevices.first { $0.id == id }?.uid }
         connectingBluetoothAddress = remembered.address
         errorMessage = nil
         defer { connectingBluetoothAddress = nil }
@@ -231,14 +481,14 @@ final class AudioDeviceStore {
                     // default. Restore the snapshot first so the clicked row changes
                     // only its own direction and the normal selection path can save
                     // and restore the correct per-device volume.
-                    if let previousInputID {
-                        try? controller.setDefaultInputDevice(previousInputID)
+                    if let id = devices.first(where: { $0.uid == previousInputUID })?.id {
+                        try? controller.setDefaultInputDevice(id)
                     }
-                    if let previousOutputID {
-                        try? controller.setDefaultOutputDevice(previousOutputID)
+                    if let id = outputDevices.first(where: { $0.uid == previousOutputUID })?.id {
+                        try? controller.setDefaultOutputDevice(id)
                     }
-                    if let previousSystemOutputID {
-                        try? controller.setSystemOutputDevice(previousSystemOutputID)
+                    if let id = outputDevices.first(where: { $0.uid == previousSystemOutputUID })?.id {
+                        try? controller.setSystemOutputDevice(id)
                     }
                     refresh()
 

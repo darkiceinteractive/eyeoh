@@ -11,10 +11,13 @@ protocol AudioDeviceControlling: Sendable {
     func setSystemOutputDevice(_ id: AudioDeviceID) throws
     func setInputVolume(_ scalar: Float32, for id: AudioDeviceID) throws
     func setOutputVolume(_ scalar: Float32, for id: AudioDeviceID) throws
+    func setInputMute(_ muted: Bool, for id: AudioDeviceID) throws
     func deviceChanges() -> AsyncStream<Void>
 }
 
 extension AudioDeviceControlling {
+    func setInputMute(_ muted: Bool, for id: AudioDeviceID) throws {}
+
     func deviceChanges() -> AsyncStream<Void> {
         AsyncStream { _ in }
     }
