@@ -1,0 +1,13 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { Content } from '../../../CHANGELOG.md';
+---
+<BaseLayout
+  title="Changelog | EyeOh"
+  description="Release notes for every version of EyeOh, the free Mac menu bar switcher for microphone, speakers and camera."
+>
+  <article class="container legal-copy legal-page changelog">
+    <p class="eyebrow">Release notes</p>
+    <Content />
+  </article>
+</BaseLayout>
