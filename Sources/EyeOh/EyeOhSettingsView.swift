@@ -7,6 +7,8 @@ struct EyeOhSettingsView: View {
     let preferences: AppPreferences
     let launchAtLogin: LaunchAtLoginController
     let softwareUpdater: SoftwareUpdateController
+    let hotkeyPreferences: HotkeyPreferences
+    let hotkeyCenter: HotkeyCenter
 
     var body: some View {
         TabView {
@@ -18,6 +20,9 @@ struct EyeOhSettingsView: View {
                 softwareUpdater: softwareUpdater
             )
             .tabItem { Label("General", systemImage: "gearshape") }
+
+            ShortcutsSettingsView(preferences: hotkeyPreferences, center: hotkeyCenter)
+                .tabItem { Label("Shortcuts", systemImage: "keyboard") }
 
             PrivacySettingsView(preferences: preferences)
                 .tabItem { Label("Privacy", systemImage: "hand.raised") }

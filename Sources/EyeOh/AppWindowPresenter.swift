@@ -16,7 +16,7 @@ enum AppWindowPresenter {
     }
 
     static func bringSettingsToFront(attemptsRemaining: Int = 6) {
-        let settingsTitles = ["General", "Privacy", "Help", "About"]
+        let settingsTitles = ["General", "Shortcuts", "Privacy", "Help", "About"]
         if let window = NSApplication.shared.windows.first(where: {
             settingsTitles.contains($0.title)
         }) {

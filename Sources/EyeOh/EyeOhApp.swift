@@ -1,3 +1,4 @@
+import AppKit
 import SwiftUI
 
 @main
@@ -8,6 +9,10 @@ struct EyeOhApp: App {
     @State private var preferences: AppPreferences
     @State private var launchAtLogin: LaunchAtLoginController
     @State private var softwareUpdater: SoftwareUpdateController
+    @State private var micMute: MicMuteController
+    @State private var hotkeyPreferences: HotkeyPreferences
+    @State private var hotkeyCenter: HotkeyCenter
+    @State private var shortcutCoordinator: ShortcutCoordinator
 
     init() {
         let store = AudioDeviceStore(controller: CoreAudioClient())
@@ -19,6 +24,24 @@ struct EyeOhApp: App {
         )
         preferences.activateTelemetry()
         Diagnostics.record(.appLaunched)
+        let micMute = MicMuteController(client: CoreAudioMicMuteClient())
+        micMute.startMonitoring()
+        let hotkeyPreferences = HotkeyPreferences()
+        let hotkeyCenter = HotkeyCenter(preferences: hotkeyPreferences)
+        let coordinator = ShortcutCoordinator(store: store, micMute: micMute)
+        hotkeyCenter.onAction = { coordinator.handle($0) }
+        hotkeyCenter.start()
+        NotificationCenter.default.addObserver(
+            forName: NSApplication.willTerminateNotification,
+            object: nil,
+            queue: .main
+        ) { _ in
+            MainActor.assumeIsolated { micMute.restoreOnQuit() }
+        }
+        _micMute = State(initialValue: micMute)
+        _hotkeyPreferences = State(initialValue: hotkeyPreferences)
+        _hotkeyCenter = State(initialValue: hotkeyCenter)
+        _shortcutCoordinator = State(initialValue: coordinator)
         _store = State(initialValue: store)
         _cameraStore = State(initialValue: CameraDeviceStore(controller: AVCameraClient()))
         _preferences = State(initialValue: preferences)
@@ -32,16 +55,21 @@ struct EyeOhApp: App {
                 store: store,
                 cameraStore: cameraStore,
                 preferences: preferences,
-                softwareUpdater: softwareUpdater
+                softwareUpdater: softwareUpdater,
+                micMute: micMute
             )
         } label: {
             HStack(spacing: 3) {
-                Image(nsImage: IORouteStatusIcon.image)
-                    .opacity(store.selectedDevice == nil ? 0.48 : 1)
+                if micMute.isSilenced {
+                    Image(systemName: "mic.slash.fill")
+                } else {
+                    Image(nsImage: IORouteStatusIcon.image)
+                        .opacity(store.selectedDevice == nil ? 0.48 : 1)
+                }
                 Text(store.menuBarTitle)
             }
             .accessibilityLabel(
-                "\(store.statusAccessibilityLabel) Preferred camera: \(cameraStore.selectedCamera?.name ?? "No camera")."
+                "\(store.statusAccessibilityLabel)\(micMute.isSilenced ? " Microphone muted." : "") Preferred camera: \(cameraStore.selectedCamera?.name ?? "No camera")."
             )
         }
         .menuBarExtraStyle(.window)
@@ -58,7 +86,9 @@ struct EyeOhApp: App {
                 cameraStore: cameraStore,
                 preferences: preferences,
                 launchAtLogin: launchAtLogin,
-                softwareUpdater: softwareUpdater
+                softwareUpdater: softwareUpdater,
+                hotkeyPreferences: hotkeyPreferences,
+                hotkeyCenter: hotkeyCenter
             )
         }
         .defaultSize(width: 620, height: 540)
