@@ -75,7 +75,7 @@ struct EyeOhApp: App {
                 "\(store.statusAccessibilityLabel)\(micMute.isSilenced ? " Microphone muted." : "") Preferred camera: \(cameraStore.selectedCamera?.name ?? "No camera")."
             )
         }
-        .menuBarExtraStyle(.window)
+        .menuBarExtraStyle(.menu)
 
         Window("Camera Preview", id: "camera-preview") {
             CameraPreviewWindow(cameraStore: cameraStore)

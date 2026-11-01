@@ -71,7 +71,8 @@ deploy-site:
 	if [ -n "$$CLOUDFLARE_API_TOKEN" ]; then export CLOUDFLARE_API_TOKEN; else unset CLOUDFLARE_API_TOKEN; echo "warning: no Cloudflare token found, relying on 'wrangler login'."; fi; \
 	if [ -n "$${CLOUDFLARE_ACCOUNT_ID:-}" ]; then export CLOUDFLARE_ACCOUNT_ID; else unset CLOUDFLARE_ACCOUNT_ID; fi; \
 	if command -v wrangler >/dev/null 2>&1; then WRANGLER=(wrangler); else WRANGLER=(npx --yes wrangler@4); fi; \
-	"$${WRANGLER[@]}" pages deploy Website/dist --project-name "$(CF_PROJECT)" --branch main --commit-dirty=true
+	cd Website; \
+	"$${WRANGLER[@]}" pages deploy dist --project-name "$(CF_PROJECT)" --branch main --commit-dirty=true
 
 mas:
 	./Scripts/build_mas_candidate.sh --submission

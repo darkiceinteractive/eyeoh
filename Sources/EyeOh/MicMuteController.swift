@@ -327,30 +327,86 @@ struct CoreAudioMicMuteClient: MicMuteControlling {
     }
 }
 
+/// Watches the default input and, on whichever device that is, its mute and volume.
+/// Mutes set by other apps (CalmWake, System Settings) then reach the menu and menu bar icon.
 private final class DefaultInputListener: @unchecked Sendable {
     private let queue = DispatchQueue(label: "au.com.darkice.eyeoh.mic-mute-events")
-    private let listener: AudioObjectPropertyListenerBlock
-    private var address = AudioObjectPropertyAddress(
+    private let deviceListener: AudioObjectPropertyListenerBlock
+    private var systemListener: AudioObjectPropertyListenerBlock?
+    private var defaultAddress = AudioObjectPropertyAddress(
         mSelector: kAudioHardwarePropertyDefaultInputDevice,
         mScope: kAudioObjectPropertyScopeGlobal,
         mElement: kAudioObjectPropertyElementMain
     )
-    private var isRegistered = false
+    private var watched: (device: AudioDeviceID, addresses: [AudioObjectPropertyAddress])?
+    private var isCancelled = false
 
     init(continuation: AsyncStream<Void>.Continuation) {
-        listener = { _, _ in continuation.yield() }
-        isRegistered = AudioObjectAddPropertyListenerBlock(
-            AudioObjectID(kAudioObjectSystemObject), &address, queue, listener
-        ) == noErr
+        deviceListener = { _, _ in continuation.yield() }
+        let systemListener: AudioObjectPropertyListenerBlock = { [weak self] _, _ in
+            self?.watchDefaultInput()
+            continuation.yield()
+        }
+        queue.sync {
+            if AudioObjectAddPropertyListenerBlock(
+                AudioObjectID(kAudioObjectSystemObject), &defaultAddress, queue, systemListener
+            ) == noErr {
+                self.systemListener = systemListener
+            }
+            watchDefaultInput()
+        }
     }
 
     func cancel() {
-        guard isRegistered else { return }
-        AudioObjectRemovePropertyListenerBlock(
-            AudioObjectID(kAudioObjectSystemObject), &address, queue, listener
-        )
-        isRegistered = false
+        queue.sync { tearDown() }
     }
 
-    deinit { cancel() }
+    deinit { tearDown() }
+
+    /// Runs on `queue`.
+    private func watchDefaultInput() {
+        unwatchDevice()
+        guard !isCancelled else { return }
+        var id = AudioDeviceID(kAudioObjectUnknown)
+        var size = UInt32(MemoryLayout<AudioDeviceID>.size)
+        guard AudioObjectGetPropertyData(
+            AudioObjectID(kAudioObjectSystemObject), &defaultAddress, 0, nil, &size, &id
+        ) == noErr, id != kAudioObjectUnknown else { return }
+
+        var addresses: [AudioObjectPropertyAddress] = []
+        for selector in [kAudioDevicePropertyMute, kAudioDevicePropertyVolumeScalar] {
+            for element in [kAudioObjectPropertyElementMain, 1, 2] {
+                var address = AudioObjectPropertyAddress(
+                    mSelector: selector,
+                    mScope: kAudioDevicePropertyScopeInput,
+                    mElement: element
+                )
+                guard AudioObjectHasProperty(id, &address),
+                      AudioObjectAddPropertyListenerBlock(id, &address, queue, deviceListener) == noErr
+                else { continue }
+                addresses.append(address)
+            }
+        }
+        watched = (id, addresses)
+    }
+
+    private func unwatchDevice() {
+        guard let watched else { return }
+        for var address in watched.addresses {
+            AudioObjectRemovePropertyListenerBlock(watched.device, &address, queue, deviceListener)
+        }
+        self.watched = nil
+    }
+
+    private func tearDown() {
+        guard !isCancelled else { return }
+        isCancelled = true
+        unwatchDevice()
+        if let systemListener {
+            AudioObjectRemovePropertyListenerBlock(
+                AudioObjectID(kAudioObjectSystemObject), &defaultAddress, queue, systemListener
+            )
+            self.systemListener = nil
+        }
+    }
 }

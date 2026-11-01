@@ -4,6 +4,8 @@ All notable changes will be recorded here. The project follows semantic versioni
 
 ## Unreleased
 
+## 0.5.0 - 2026-10-30
+
 ### Added
 
 - Mic Lock and device priority: rank your inputs and outputs and EyeOh keeps the highest ranked connected device active (off by default).
@@ -14,8 +16,10 @@ All notable changes will be recorded here. The project follows semantic versioni
 
 ### Fixed
 
+- Restore the compact native menu so input, output and camera devices stay visible. Keep Bluetooth reconnect, mute, volume presets, priority status and camera preferences available.
 - Input going stale or silent after Bluetooth headsets connect or disconnect. EyeOh now follows stream changes and repairs a default input that has no usable stream.
 - Reconnecting a Bluetooth device no longer restores outdated device IDs.
+- The menu and menu bar icon now update straight away when another app or System Settings mutes the microphone.
 
 ## 0.4.1 - 2026-08-18
 
