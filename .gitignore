@@ -18,6 +18,9 @@ Icon.icns
 xcuserdata/
 .env
 .env.*
+__pycache__/
+TelemetryGateway/.wrangler/
+TelemetryGateway/build/
 !.env.example
 *.p12
 *.mobileprovision
