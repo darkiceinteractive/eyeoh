@@ -1,16 +1,26 @@
 name: CI
 
 on:
+  push:
+    branches: [main, 'release/**']
+  pull_request:
   workflow_dispatch:
 
 permissions:
   contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   source-validation:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
       - name: Show toolchain
         run: swift --version
       - name: Build and test
@@ -23,7 +33,34 @@ jobs:
           ARCHES="arm64 x86_64" ./Scripts/package_app.sh release
           lipo build/EyeOh.app/Contents/MacOS/EyeOh -verify_arch arm64 x86_64
           codesign --verify --deep --strict build/EyeOh.app
+      - name: Package universal direct-download candidate
+        run: |
+          DISTRIBUTION_CHANNEL=direct APP_BUILD_ROOT="$PWD/build/direct" ARCHES="arm64 x86_64" ./Scripts/package_app.sh release
+          lipo build/direct/EyeOh.app/Contents/MacOS/EyeOh -verify_arch arm64 x86_64
+          codesign --verify --deep --strict build/direct/EyeOh.app
+          test -d build/direct/EyeOh.app/Contents/Frameworks/Sparkle.framework
       - name: Install ShellCheck
         run: brew install shellcheck
       - name: Lint shell scripts
         run: shellcheck Scripts/*.sh run-menubar.sh stop-menubar.sh
+
+  website-build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: Website
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: Website/package-lock.json
+      - name: Install dependencies
+        run: npm ci
+      - name: Type-check and build
+        run: npm run build
+      - name: Compile download-counting Function
+        env:
+          WRANGLER_SEND_METRICS: 'false'
+        run: npx --yes wrangler@4.110.0 pages functions build functions --outdir .wrangler/functions-build
