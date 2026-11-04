@@ -11,6 +11,18 @@ if ! grep -Fq "Version $MARKETING_VERSION" "$PROJECT_ROOT/Website/src/pages/inde
     exit 1
 fi
 
+node - "$PROJECT_ROOT" "$MARKETING_VERSION" <<'JS'
+const fs = require('node:fs');
+const [root, expected] = process.argv.slice(2);
+for (const file of ['package.json', 'package-lock.json']) {
+    const json = JSON.parse(fs.readFileSync(`${root}/Website/${file}`, 'utf8'));
+    if (json.version !== expected || (json.packages && json.packages[''].version !== expected)) {
+        console.error(`Website/${file} version does not match MARKETING_VERSION=${expected}.`);
+        process.exit(1);
+    }
+}
+JS
+
 if ! grep -Fq "## $MARKETING_VERSION" "$PROJECT_ROOT/CHANGELOG.md"; then
     echo "Changelog has no section for $MARKETING_VERSION." >&2
     exit 1

@@ -18,6 +18,9 @@ jobs:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
       - name: Show toolchain
         run: swift --version
       - name: Build and test
