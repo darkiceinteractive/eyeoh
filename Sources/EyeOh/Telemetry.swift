@@ -2,42 +2,42 @@ import Foundation
 import Sentry
 
 struct TelemetryConfiguration: Equatable {
-    let postHogProjectToken: String?
-    let postHogHost: String?
+    static let ownedStatisticsEndpoint = URL(string: "https://eyeoh-telemetry.darkice.workers.dev/events")!
+    let statisticsEndpoint: URL?
     let sentryDSN: String?
     let distributionChannel: String
 
     var hasStatisticsProvider: Bool {
-        guard nonEmpty(postHogProjectToken) != nil,
-              let value = nonEmpty(postHogHost),
-              let url = URL(string: value) else { return false }
-        return url.scheme == "https" && url.host == "eu.i.posthog.com"
+        isReleaseChannel && statisticsEndpoint == Self.ownedStatisticsEndpoint
     }
 
     var hasCrashReportingProvider: Bool {
-        guard let value = nonEmpty(sentryDSN), let url = URL(string: value) else { return false }
+        guard isReleaseChannel, let value = nonEmpty(sentryDSN), let url = URL(string: value) else { return false }
         return url.scheme == "https" && (url.host?.hasSuffix(".ingest.de.sentry.io") == true)
+            && url.user?.isEmpty == false && url.password == nil && url.port == nil
+            && url.path.range(of: "^/[0-9]+$", options: .regularExpression) != nil
+            && url.query == nil && url.fragment == nil
     }
 
     init(bundle: Bundle = .main) {
-        postHogProjectToken = bundle.object(forInfoDictionaryKey: "EyeOhPostHogProjectToken") as? String
-        postHogHost = bundle.object(forInfoDictionaryKey: "EyeOhPostHogHost") as? String
+        statisticsEndpoint = (bundle.object(forInfoDictionaryKey: "EyeOhStatisticsEndpoint") as? String)
+            .flatMap(URL.init(string:))
         sentryDSN = bundle.object(forInfoDictionaryKey: "EyeOhSentryDSN") as? String
         distributionChannel = (bundle.object(forInfoDictionaryKey: "EyeOhDistributionChannel") as? String)
             .flatMap(Self.nonEmpty) ?? "source"
     }
 
     init(
-        postHogProjectToken: String?,
-        postHogHost: String?,
-        sentryDSN: String?,
+        statisticsEndpoint: URL? = nil,
+        sentryDSN: String? = nil,
         distributionChannel: String = "source"
     ) {
-        self.postHogProjectToken = postHogProjectToken
-        self.postHogHost = postHogHost
+        self.statisticsEndpoint = statisticsEndpoint
         self.sentryDSN = sentryDSN
         self.distributionChannel = distributionChannel
     }
+
+    private var isReleaseChannel: Bool { ["direct", "mas"].contains(distributionChannel) }
 
     private func nonEmpty(_ value: String?) -> String? {
         Self.nonEmpty(value)
@@ -52,12 +52,34 @@ struct TelemetryConfiguration: Equatable {
 }
 
 @MainActor
+protocol StatisticsTransport {
+    func send(_ request: URLRequest, body: Data)
+    func cancel()
+}
+
+@MainActor
+final class URLSessionStatisticsTransport: StatisticsTransport {
+    private let session: URLSession
+
+    init(configuration: URLSessionConfiguration) {
+        session = URLSession(configuration: configuration)
+    }
+
+    func send(_ request: URLRequest, body: Data) {
+        session.uploadTask(with: request, from: body).resume()
+    }
+
+    func cancel() { session.invalidateAndCancel() }
+}
+
+@MainActor
 final class Telemetry {
     static let shared = Telemetry()
 
     private let configuration: TelemetryConfiguration
     private let defaults: UserDefaults
-    private var postHogSession: URLSession?
+    private let makeStatisticsTransport: (URLSessionConfiguration) -> any StatisticsTransport
+    private var statisticsTransport: (any StatisticsTransport)?
     private var sentryStarted = false
 
     var hasStatisticsProvider: Bool { configuration.hasStatisticsProvider }
@@ -68,10 +90,14 @@ final class Telemetry {
 
     init(
         configuration: TelemetryConfiguration = TelemetryConfiguration(),
-        defaults: UserDefaults = .standard
+        defaults: UserDefaults = .standard,
+        makeStatisticsTransport: @escaping (URLSessionConfiguration) -> any StatisticsTransport = {
+            URLSessionStatisticsTransport(configuration: $0)
+        }
     ) {
         self.configuration = configuration
         self.defaults = defaults
+        self.makeStatisticsTransport = makeStatisticsTransport
     }
 
     func configure(statisticsEnabled: Bool, crashReportingEnabled: Bool) {
@@ -82,10 +108,10 @@ final class Telemetry {
     func setStatisticsEnabled(_ enabled: Bool) {
         guard configuration.hasStatisticsProvider else { return }
         if enabled {
-            startPostHogIfNeeded()
-        } else if let postHogSession {
-            postHogSession.invalidateAndCancel()
-            self.postHogSession = nil
+            startStatisticsIfNeeded()
+        } else if let statisticsTransport {
+            statisticsTransport.cancel()
+            self.statisticsTransport = nil
         }
     }
 
@@ -101,14 +127,11 @@ final class Telemetry {
     }
 
     func capture(_ event: Diagnostics.Event) {
-        guard let postHogSession,
-              let token = configuration.postHogProjectToken,
-              let host = configuration.postHogHost,
-              let endpoint = URL(string: host)?.appendingPathComponent("batch") else { return }
+        guard let statisticsTransport,
+              let endpoint = configuration.statisticsEndpoint else { return }
 
-        let payload = PostHogPayloadBuilder.make(
+        let payload = StatisticsPayloadBuilder.make(
             event: event,
-            token: token,
             distinctID: analyticsInstallationIdentifier,
             properties: minimalEventProperties
         )
@@ -119,17 +142,18 @@ final class Telemetry {
         request.timeoutInterval = 10
         request.cachePolicy = .reloadIgnoringLocalCacheData
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        postHogSession.uploadTask(with: request, from: body).resume()
+        statisticsTransport.send(request, body: body)
     }
 
-    private func startPostHogIfNeeded() {
-        guard postHogSession == nil else { return }
+    private func startStatisticsIfNeeded() {
+        guard statisticsTransport == nil else { return }
         _ = analyticsInstallationIdentifier
         let sessionConfiguration = URLSessionConfiguration.ephemeral
         sessionConfiguration.httpCookieStorage = nil
+        sessionConfiguration.httpShouldSetCookies = false
         sessionConfiguration.urlCache = nil
         sessionConfiguration.requestCachePolicy = .reloadIgnoringLocalCacheData
-        postHogSession = URLSession(configuration: sessionConfiguration)
+        statisticsTransport = makeStatisticsTransport(sessionConfiguration)
     }
 
     private func startSentryIfNeeded() {
@@ -174,9 +198,6 @@ final class Telemetry {
     private var minimalEventProperties: [String: Any] {
         let bundle = Bundle.main
         return [
-            "$process_person_profile": false,
-            "$geoip_disable": true,
-            "schema_version": 1,
             "app_version": bundle.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "unknown",
             "app_build": bundle.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "unknown",
             "distribution": configuration.distributionChannel,
@@ -200,38 +221,25 @@ final class Telemetry {
     }
 }
 
-enum PostHogPayloadBuilder {
+enum StatisticsPayloadBuilder {
     static let commonPropertyKeys: Set<String> = [
-        "$process_person_profile",
-        "$geoip_disable",
-        "schema_version",
         "app_version",
         "app_build",
         "distribution",
-        "distinct_id",
     ]
 
     static func make(
         event: Diagnostics.Event,
-        token: String,
         distinctID: String,
         properties: [String: Any],
-        date: Date = Date(),
         uuid: UUID = UUID()
     ) -> [String: Any] {
-        var allowlistedProperties = properties.filter { commonPropertyKeys.contains($0.key) }
-        allowlistedProperties["distinct_id"] = distinctID
-        let timestamp = ISO8601DateFormatter().string(from: date)
+        let allowlistedProperties = properties.filter { commonPropertyKeys.contains($0.key) }
         return [
-            "api_key": token,
-            "batch": [[
-                "event": event.rawValue,
-                "distinct_id": distinctID,
-                "properties": allowlistedProperties,
-                "timestamp": timestamp,
-                "uuid": uuid.uuidString.lowercased(),
-            ]],
-            "sent_at": timestamp,
+            "event": event.rawValue,
+            "distinct_id": distinctID,
+            "properties": allowlistedProperties,
+            "uuid": uuid.uuidString.lowercased(),
         ]
     }
 }

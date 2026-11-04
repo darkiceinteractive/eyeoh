@@ -4,6 +4,9 @@ All notable changes will be recorded here. The project follows semantic versioni
 
 ## Unreleased
 
+- Prepare optional usage statistics through an owned, rate-limited gateway with a fixed event schema. Provider connection and live validation remain required before a configured release.
+- Keep source builds offline even when release reporting variables are inherited, and strengthen EU crash-reporting configuration checks.
+
 ## 0.5.0 - 2026-10-30
 
 ### Added

@@ -66,3 +66,9 @@ jobs:
         env:
           WRANGLER_SEND_METRICS: 'false'
         run: npx --yes wrangler@4.110.0 pages functions build functions --outdir .wrangler/functions-build
+      - name: Test telemetry gateway
+        run: node --test ../TelemetryGateway/test/*.test.mjs
+      - name: Compile telemetry gateway
+        env:
+          WRANGLER_SEND_METRICS: 'false'
+        run: npx --yes wrangler@4.110.0 deploy --config ../TelemetryGateway/wrangler.jsonc --dry-run --outdir .wrangler/telemetry-build
