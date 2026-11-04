@@ -30,6 +30,12 @@ jobs:
           ARCHES="arm64 x86_64" ./Scripts/package_app.sh release
           lipo build/EyeOh.app/Contents/MacOS/EyeOh -verify_arch arm64 x86_64
           codesign --verify --deep --strict build/EyeOh.app
+      - name: Package universal direct-download candidate
+        run: |
+          DISTRIBUTION_CHANNEL=direct APP_BUILD_ROOT="$PWD/build/direct" ARCHES="arm64 x86_64" ./Scripts/package_app.sh release
+          lipo build/direct/EyeOh.app/Contents/MacOS/EyeOh -verify_arch arm64 x86_64
+          codesign --verify --deep --strict build/direct/EyeOh.app
+          test -d build/direct/EyeOh.app/Contents/Frameworks/Sparkle.framework
       - name: Install ShellCheck
         run: brew install shellcheck
       - name: Lint shell scripts

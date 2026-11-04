@@ -6,6 +6,18 @@
         <description>Signed direct-download updates for EyeOh.</description>
         <language>en-au</language>
         <item>
+            <title>0.5.0</title>
+            <pubDate>Sun, 01 Nov 2026 10:36:31 +1000</pubDate>
+            <link>https://eyeoh.app/</link>
+            <sparkle:version>8</sparkle:version>
+            <sparkle:shortVersionString>0.5.0</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
+            <enclosure url="https://eyeoh.app/updates/EyeOh-0.5.0-8.zip" length="3781725" type="application/octet-stream" sparkle:edSignature="8bu0k23nHZ+L1kmoYnzQCH1eqdq4JHSbJU9NgS24sCz5+lxLcfdVqnN9SZA3ckIvyPHQoGxYDY2PX31Zz57vCQ=="/>
+            <sparkle:deltas>
+                <enclosure url="https://eyeoh.app/updates/EyeOh8-7.delta" sparkle:deltaFrom="7" length="15298" type="application/octet-stream" sparkle:deltaFromSparkleExecutableSize="977808" sparkle:deltaFromSparkleLocales="de,he,ar,el,ja,fa,uk" sparkle:edSignature="C3SAePNBeiAYT6ksM5yVJ0T0B3r3eeiKNxd+DnwvfBbnucohdNbv1ZKNPRIUkrhUrbIHtw6ahayDDJOStkpnBQ=="/>
+            </sparkle:deltas>
+        </item>
+        <item>
             <title>0.4.1</title>
             <pubDate>Tue, 18 Aug 2026 23:02:03 +1000</pubDate>
             <link>https://eyeoh.app/</link>
