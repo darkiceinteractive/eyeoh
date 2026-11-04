@@ -1,15 +1,16 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import pkg from '../../package.json';
 ---
 <BaseLayout title="Privacy | EyeOh" description="What the current EyeOh download stores locally, sends, and does not collect.">
   <article class="container legal-copy legal-page">
     <p class="eyebrow">Privacy</p>
     <h1>Clear about what happens today.</h1>
-    <p class="legal-updated">Last updated 11 August 2026 for EyeOh 0.4.0.</p>
+    <p class="legal-updated">Last updated 4 November 2026 for EyeOh {pkg.version}.</p>
 
     <div class="legal-callout legal-callout-positive">
       <strong>The current public build sends no EyeOh diagnostics.</strong>
-      <p>EyeOh 0.4.0 was packaged without a PostHog project token, PostHog host, or Sentry DSN. Its statistics and crash-reporting controls are unavailable, so no EyeOh analytics or crash reports leave your Mac.</p>
+      <p>EyeOh {pkg.version} is packaged without a PostHog project token, PostHog host, or Sentry DSN. Its statistics and crash-reporting controls are unavailable, so no EyeOh analytics or crash reports leave your Mac.</p>
     </div>
 
     <figure class="legal-figure">
@@ -38,7 +39,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     <p>Bluetooth access is used only after you click a remembered disconnected audio device. EyeOh asks macOS to reconnect that already-paired device. It does not scan for arbitrary nearby accessories, pair new devices, or connect them automatically.</p>
 
     <h2>Diagnostics code that is not active today</h2>
-    <p>The open-source project contains consent-gated support for limited product statistics through PostHog and native crash or hang reporting through Sentry. Those paths require release-time provider configuration that is absent from EyeOh 0.4.0. Disabled code is not collection.</p>
+    <p>The open-source project contains consent-gated support for limited product statistics through PostHog and native crash or hang reporting through Sentry. Those paths require release-time provider configuration that is absent from this release. Disabled code is not collection.</p>
     <p>Dark Ice will update this policy and complete provider-side privacy, retention, abuse-prevention, receipt and deletion checks before distributing any build with either service connected. A configured build must continue to show separate controls and must not send device names, recordings, screenshots, contact details, email content, or free text.</p>
 
     <h2>Website hosting and download measurement</h2>

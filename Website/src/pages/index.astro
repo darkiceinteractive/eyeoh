@@ -14,7 +14,7 @@ const faqs = [
   { question: 'Does EyeOh need microphone permission?', answer: 'No. It changes device settings but never captures microphone audio.' },
   { question: 'How does Bluetooth reconnect work?', answer: 'After EyeOh has seen a paired Bluetooth audio device, it keeps a dimmed shortcut while that route is disconnected. Clicking it asks macOS to reconnect. EyeOh does not scan for, pair or automatically connect unknown devices.' },
   { question: 'Can I use my iPhone camera?', answer: 'Yes. An eligible nearby iPhone made available by Apple Continuity Camera appears automatically. Camera preview needs permission only while its window is open.' },
-  { question: 'What diagnostics are collected today?', answer: 'None by EyeOh 0.4. PostHog and Sentry support exists in the source, but the current public build contains no provider configuration. The Settings switches are disabled and no EyeOh analytics or crash reports are sent.' },
+  { question: 'What diagnostics are collected today?', answer: 'This release sends no EyeOh diagnostics. PostHog and Sentry support exists in the source, but the download contains no provider configuration. The Settings switches are disabled and no EyeOh analytics or crash reports are sent.' },
   { question: 'Will EyeOh be on the Mac App Store?', answer: 'The direct notarized download is available now. A sandboxed Mac App Store edition is planned; macOS permits both channels, and each will be clearly labelled if their capabilities differ.' },
   { question: 'Is EyeOh open source?', answer: 'Yes. EyeOh Core is MIT-licensed. Official Dark Ice names and artwork are protected separately.' },
 ];
@@ -221,7 +221,7 @@ const jsonLd = [
       <div>
         <p class="eyebrow">The app sends nothing</p>
         <h2 id="privacy-title">No recording. No in-app analytics. No crash uploads.</h2>
-        <p>EyeOh 0.4 stores device choices, remembered Bluetooth shortcuts and volume presets on your Mac. Camera access is used only while a preview you opened is visible. The shipping build has no PostHog or Sentry service connected, so both reporting controls are unavailable and no EyeOh diagnostics leave your Mac. The website counts aggregate download-button intent without cookies or a visitor identifier.</p>
+        <p>EyeOh stores device choices, remembered Bluetooth shortcuts and volume presets on your Mac. Camera access is used only while a preview you opened is visible. The shipping build has no PostHog or Sentry service connected, so both reporting controls are unavailable and no EyeOh diagnostics leave your Mac. The website counts aggregate download-button intent without cookies or a visitor identifier.</p>
         <p><a href="/privacy/">Read the current-data statement and future diagnostics boundary →</a></p>
       </div>
     </div>
