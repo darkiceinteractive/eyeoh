@@ -27,6 +27,8 @@ jobs:
         run: swift test
       - name: Check release metadata
         run: ./Scripts/check_release_metadata.sh
+      - name: Test deployment credential loading
+        run: python3 -m unittest discover -s Tests/ReleaseTooling -v
       - name: Package universal ad-hoc build
         run: |
           ./Scripts/build_icon.sh

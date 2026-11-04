@@ -14,7 +14,6 @@ DRY_RUN        ?= 0
 NOTARY_PROFILE ?= eyeoh
 AI_ENV         ?= $(HOME)/.darkiceconfig/aiconfig.env
 CF_PROJECT     := $(shell sed -n 's/.*"name"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' Website/wrangler.jsonc | head -n 1)
-CF_ACCOUNT     := $(shell sed -n 's/.*"account_id"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' Website/wrangler.jsonc | head -n 1)
 TAG            := v$(MARKETING_VERSION)
 DMG_FILE       := dist/EyeOh-$(MARKETING_VERSION)-$(BUILD_NUMBER).dmg
 ZIP_FILE       := dist/EyeOh-$(MARKETING_VERSION)-$(BUILD_NUMBER).zip
@@ -66,16 +65,7 @@ bump:
 # if set there or in the shell. With neither set, wrangler falls back to its own login.
 deploy-site:
 	./Scripts/verify_site_artifacts.sh
-	@set -eu; \
-	if [ -f "$(AI_ENV)" ]; then set -a; . "$(AI_ENV)"; set +a; fi; \
-	CLOUDFLARE_API_TOKEN="$${CLOUDFLARE_API_TOKEN:-$${CLOUDFLARE_ADMIN_API_TOKEN:-}}"; \
-	if [ -n "$$CLOUDFLARE_API_TOKEN" ]; then export CLOUDFLARE_API_TOKEN; else unset CLOUDFLARE_API_TOKEN; echo "warning: no Cloudflare token found, relying on 'wrangler login'."; fi; \
-	CLOUDFLARE_ACCOUNT_ID="$${CLOUDFLARE_ACCOUNT_ID:-$(CF_ACCOUNT)}"; \
-	if [ -z "$$CLOUDFLARE_ACCOUNT_ID" ]; then echo "Set account_id in Website/wrangler.jsonc or CLOUDFLARE_ACCOUNT_ID before deploying." >&2; exit 1; fi; \
-	export CLOUDFLARE_ACCOUNT_ID; \
-	if command -v wrangler >/dev/null 2>&1; then WRANGLER=(wrangler); else WRANGLER=(npx --yes wrangler@4); fi; \
-	cd Website; \
-	"$${WRANGLER[@]}" pages deploy dist --project-name "$(CF_PROJECT)" --branch main --commit-dirty=true
+	python3 Scripts/deploy_site.py --credentials-file "$(AI_ENV)"
 
 mas:
 	./Scripts/build_mas_candidate.sh --submission
