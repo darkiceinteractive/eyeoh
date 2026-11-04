@@ -69,3 +69,5 @@ All steps run on an authorised Dark Ice Mac. `make help` lists every target.
 Run `Scripts/build_site_assets.sh` (needs `rsvg-convert`) to rebuild the social card, favicons and Apple touch icon when the mark or the main menu screenshot changes.
 
 Wrangler must run from `Website/` when deploying. This includes `Website/functions/analytics/download.js` with the static files; running from the repository root would miss the download-counting Function. CI separately compiles that Function with a pinned Wrangler version.
+
+`Website/wrangler.jsonc` pins the non-secret account identifier for the project serving `eyeoh.app`. `make deploy-site` exports it as `CLOUDFLARE_ACCOUNT_ID` unless the environment already supplies an override. This avoids an interactive account-selection prompt when the deployment token can access several accounts. Forks must select their own project and account before deploying.
