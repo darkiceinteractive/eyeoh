@@ -4,11 +4,11 @@ EyeOh supports optional PostHog product statistics and Sentry crash reporting. B
 
 Consent schema version 1 deliberately clears any saved values from the earlier placeholder-only settings. Offline/source builds also force unavailable choices off. A user therefore has to make a fresh choice in an official configured build before the first network event can be created.
 
-## Measurement readiness: 82/100 — needs production validation
+## Measurement readiness: 55/100, awaiting provider access and production validation
 
-The instrumentation boundary, consent controls, EU-only configuration, event vocabulary, ownership and privacy notice are implemented and tested locally. Production project receipt, PostHog IP-discard configuration, Sentry IP scrubbing, symbol upload/symbolication and retention evidence are still required before the public build can truthfully ship with either provider configured.
+The consent boundary, owned gateway, EU-only forwarding and event vocabulary have local regression coverage. This is a readiness assessment, not a usage metric: decision alignment 25/25, event model 20/20, data integrity 4/20, conversion 4/15, attribution 0/10 and operational governance 2/10. Provider access, actual receipt, IP-discard settings, symbolication and retention checks remain incomplete. EyeOh 0.5.0 build 8 contains no provider configuration and sends no app diagnostics.
 
-Dark Ice Interactive owns the data and release configuration. Provider administration must use a named Dark Ice account with multi-factor authentication. Project tokens and DSNs are public ingestion identifiers rather than administrator credentials, but they are still injected only into official builds to limit casual event pollution. They cannot be made secret after distribution. PostHog personal API keys, project-secret API keys and Sentry auth tokens must never enter the app or repository. See `RELEASING.md`.
+Dark Ice Interactive owns the data and release configuration. Provider administration must use a named Dark Ice account with multi-factor authentication. The Sentry DSN is a public ingestion identifier injected only into configured official builds. The PostHog project token stays in the gateway secret store and never enters the app. Neither identifier grants administrative access. PostHog personal API keys, project-secret API keys and Sentry auth tokens must never enter the app or repository. See `RELEASING.md`.
 
 ## Decision → event map
 
@@ -31,11 +31,11 @@ There is no app-level purchase or signup conversion. The website separately coun
 
 ## PostHog configuration
 
-The current client can post the fixed events directly to PostHog’s batch ingestion endpoint with an ephemeral `URLSession`. It does not bundle the PostHog mobile SDK. Consequently there is no autocapture, session replay, screen capture, feature-flag loading, surveys, lifecycle capture, person-profile creation, cookie store, or offline event queue.
+The client posts fixed events to the owned gateway at `https://eyeoh-telemetry.darkice.workers.dev/events` using an ephemeral, cookie-free `URLSession`. It does not bundle the PostHog mobile SDK. Consequently there is no autocapture, session replay, screen capture, feature-flag loading, surveys, lifecycle capture, person-profile creation, cookie store, or offline event queue.
 
-PostHog documents event capture as a public POST-only endpoint without request-level rate limiting. The production release must therefore route statistics through `telemetry.eyeoh.app`: a minimal Cloudflare Worker that holds the project token as a Worker secret, rebuilds only the allowlisted schema, rejects unknown events/properties and oversized requests, and rate-limits abuse. Until that gateway is deployed and validated, production builds must leave `POSTHOG_PROJECT_TOKEN` unset.
+PostHog documents event capture as a public POST-only endpoint without request-level rate limiting. The gateway in `TelemetryGateway/` holds the project token as a Worker secret, rebuilds only the allowlisted schema, rejects unknown fields and requests over 2 KiB, and limits callers to 30 requests per minute per Cloudflare location. It hashes the connecting IP with a private salt and daily rotation only for short-lived abuse counters; raw IPs and these keys never enter the forwarded event. It forwards no client headers, disables Worker invocation logs and adds `$ip=null`, `$geoip_disable=true` and `$process_person_profile=false`. The existing Workers subdomain avoids a production DNS change. Until gateway deployment and provider receipt are validated, release builds must leave `EYEOH_STATISTICS_ENDPOINT` unset. See `TelemetryGateway/README.md`.
 
-Official builds accept only `https://eu.i.posthog.com`. Before release, the project owner must:
+The client accepts only the exact owned gateway URL. Only the gateway contacts `https://eu.i.posthog.com`. Before release, the project owner must:
 
 1. enable “Discard client IP data” at project level;
 2. verify GeoIP enrichment is disabled;
@@ -51,25 +51,24 @@ EyeOh includes Sentry Cocoa 9.25.0 under its MIT licence. Official builds accept
 
 Enabled: native crashes, watchdog terminations and app hangs. Disabled: default PII, performance tracing, automatic sessions, network/UI/system breadcrumbs, network and file instrumentation, logs, screenshots, attachments, memory introspection and analytics identifiers. The `beforeSend` hook removes user, request, breadcrumb and arbitrary-extra fields. Disabling reporting closes the SDK without a flush window and removes its local cache.
 
-Before release, the project owner must enable Prevent Storing IP Addresses and default server-side data scrubbing, disable AI/Seer for the project, upload matching dSYMs, trigger one synthetic non-production test crash, verify symbolication and alert ownership, then remove the test issue.
+Before release, the project owner must enable Prevent Storing IP Addresses and default server-side data scrubbing, disable automated issue analysis for the project, upload matching dSYMs, trigger one synthetic non-production test crash, verify symbolication and alert ownership, then remove the test issue.
 
 ## Packaging contract
 
 `Scripts/package_app.sh` reads these environment variables without printing them:
 
-- `POSTHOG_PROJECT_TOKEN`
-- `POSTHOG_HOST` (must be `https://eu.i.posthog.com`)
+- `EYEOH_STATISTICS_ENDPOINT` (the exact owned gateway URL, after live validation)
 - `SENTRY_DSN` (must be an EU-region DSN)
 - `SENTRY_AUTH_TOKEN`, `SENTRY_ORG`, and `SENTRY_PROJECT` (release-time dSYM upload only; never embedded)
-- `DISTRIBUTION_CHANNEL` (`direct`, `mas`, `setapp`, or `source`)
+- `DISTRIBUTION_CHANNEL` (`direct`, `mas`, or `source`)
 
-If no provider values are present, the packaged app reports that no service is connected and sends nothing. The public repository therefore remains runnable without a Dark Ice account.
+Source packages strip provider configuration even if release variables are inherited. If no provider values are present, the packaged app reports that no service is connected and sends nothing. The public repository therefore remains runnable without a Dark Ice account.
 
 ## Release evidence still required
 
 - [ ] PostHog EU project created; IP discard and access controls captured.
-- [ ] `telemetry.eyeoh.app` gateway deployed with schema validation, payload limit, rate limiting and a Worker-held PostHog project token.
-- [ ] Sentry EU project created; IP scrubbing, data scrubbing and AI-off state captured.
+- [ ] `eyeoh-telemetry.darkice.workers.dev` gateway deployed with schema validation, payload limit, rate limiting and a Worker-held PostHog project token.
+- [ ] Sentry EU project created; IP scrubbing, data scrubbing and automated-analysis-disabled state captured.
 - [ ] Release environment values loaded from the Dark Ice secret store without appearing in logs.
 - [ ] Each allowed PostHog event received with only the allowlisted properties.
 - [ ] Opt-out confirmed to produce no network requests.

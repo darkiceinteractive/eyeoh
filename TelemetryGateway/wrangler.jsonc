@@ -1,0 +1,13 @@
+{
+  "name": "eyeoh-telemetry",
+  "account_id": "8a592e7734af5ccb6f61fe635b6a0c07",
+  "main": "src/worker.mjs",
+  "compatibility_date": "2026-11-04",
+  "workers_dev": true,
+  "observability": { "enabled": false },
+  "ratelimits": [{
+    "name": "EVENT_RATE_LIMITER",
+    "namespace_id": "500001",
+    "simple": { "limit": 30, "period": 60 }
+  }]
+}

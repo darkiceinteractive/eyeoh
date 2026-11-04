@@ -22,7 +22,7 @@ The following values belong only in the Dark Ice local secret store or a future 
 - PostHog personal or project-secret API keys.
 - Cloudflare deployment/API credentials.
 
-`POSTHOG_PROJECT_TOKEN` and `SENTRY_DSN` are client ingestion identifiers, not administrator credentials. They do not grant dashboard or account access, but a determined person can extract them from any distributed client and attempt to submit false events. Keeping them out of Git prevents casual pollution of source builds; it cannot make them secret after release.
+`SENTRY_DSN` is a public client ingestion identifier, not an administrator credential. It cannot be kept secret after distribution and does not grant dashboard access. `POSTHOG_PROJECT_TOKEN` stays in the owned gateway's Worker secret store and never enters the app. Neither value belongs in Git.
 
 ## Official release boundary
 
@@ -49,7 +49,7 @@ Private build infrastructure protects signing and administrative credentials, bu
 - give Sentry a dedicated client key with a conservative DSN rate limit and spike protection;
 - accept only known release/environment values and use strict server-side data scrubbing;
 - monitor quota anomalies and rotate the client key if polluted;
-- do not enable PostHog ingestion until a small `telemetry.eyeoh.app` Cloudflare Worker gateway validates the exact six-event schema, enforces payload-size and rate limits, and keeps the PostHog project token in a Worker secret.
+- leave `EYEOH_STATISTICS_ENDPOINT` unset until the owned `eyeoh-telemetry.darkice.workers.dev` gateway is deployed and validated with the dedicated EyeOh EU project. The gateway validates the exact six-event schema, enforces payload-size and rate limits, and keeps the PostHog project token in a Worker secret. No production DNS change is required.
 
 The gateway materially reduces casual abuse and prevents the PostHog token appearing in the app, but its public endpoint can still be imitated. Cryptographic proof of an official Apple-signed client would require an attestation design and is a later hardening feature, not something GitHub secrecy alone can provide.
 

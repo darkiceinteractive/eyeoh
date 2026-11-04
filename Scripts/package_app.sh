@@ -9,8 +9,7 @@ MINIMUM_MACOS_VERSION="14.0"
 SIGNING_MODE=${SIGNING_MODE:-adhoc}
 APP_IDENTITY=${APP_IDENTITY:-}
 APP_ENTITLEMENTS=${APP_ENTITLEMENTS:-"$PROJECT_ROOT/Config/EyeOh-Direct.entitlements"}
-POSTHOG_PROJECT_TOKEN=${POSTHOG_PROJECT_TOKEN:-}
-POSTHOG_HOST=${POSTHOG_HOST:-}
+EYEOH_STATISTICS_ENDPOINT=${EYEOH_STATISTICS_ENDPOINT:-}
 SENTRY_DSN=${SENTRY_DSN:-}
 DISTRIBUTION_CHANNEL=${DISTRIBUTION_CHANNEL:-source}
 MAS_PROVISIONING_PROFILE=${MAS_PROVISIONING_PROFILE:-}
@@ -25,6 +24,29 @@ if [[ "$DISTRIBUTION_CHANNEL" != "source" && "$DISTRIBUTION_CHANNEL" != "direct"
     echo "DISTRIBUTION_CHANNEL must be source, direct or mas." >&2
     exit 2
 fi
+if [[ "$DISTRIBUTION_CHANNEL" == "source" ]]; then
+    EYEOH_STATISTICS_ENDPOINT=
+    SENTRY_DSN=
+fi
+if [[ -n "$EYEOH_STATISTICS_ENDPOINT" && "$EYEOH_STATISTICS_ENDPOINT" != "https://eyeoh-telemetry.darkice.workers.dev/events" ]]; then
+    echo "Official EyeOh builds require the owned statistics gateway." >&2
+    exit 1
+fi
+SENTRY_DSN="$SENTRY_DSN" python3 - <<'PY'
+import os, re, sys
+from urllib.parse import urlsplit
+value = os.environ.get('SENTRY_DSN', '')
+if value:
+    try:
+        url = urlsplit(value)
+        valid = (url.scheme == 'https' and (url.hostname or '').endswith('.ingest.de.sentry.io')
+            and url.username and url.password is None and url.port is None
+            and re.fullmatch(r'/[0-9]+', url.path) and not url.query and not url.fragment)
+    except (ValueError, UnicodeError):
+        valid = False
+    if not valid:
+        sys.exit('Official EyeOh builds require a valid Sentry EU-region ingestion DSN.')
+PY
 
 cd "$PROJECT_ROOT"
 # version.env is resolved from the repository root at runtime.
@@ -119,19 +141,10 @@ if [[ "$DISTRIBUTION_CHANNEL" == "direct" ]]; then
     /usr/bin/plutil -insert SUScheduledCheckInterval -integer 86400 "$APP_BUNDLE/Contents/Info.plist"
     /usr/bin/plutil -insert SUVerifyUpdateBeforeExtraction -bool true "$APP_BUNDLE/Contents/Info.plist"
 fi
-if [[ -n "$POSTHOG_PROJECT_TOKEN" && -n "$POSTHOG_HOST" ]]; then
-    if [[ "$POSTHOG_HOST" != "https://eu.i.posthog.com" ]]; then
-        echo "Official EyeOh builds require POSTHOG_HOST=https://eu.i.posthog.com" >&2
-        exit 1
-    fi
-    /usr/bin/plutil -insert EyeOhPostHogProjectToken -string "$POSTHOG_PROJECT_TOKEN" "$APP_BUNDLE/Contents/Info.plist"
-    /usr/bin/plutil -insert EyeOhPostHogHost -string "$POSTHOG_HOST" "$APP_BUNDLE/Contents/Info.plist"
+if [[ -n "$EYEOH_STATISTICS_ENDPOINT" ]]; then
+    /usr/bin/plutil -insert EyeOhStatisticsEndpoint -string "$EYEOH_STATISTICS_ENDPOINT" "$APP_BUNDLE/Contents/Info.plist"
 fi
 if [[ -n "$SENTRY_DSN" ]]; then
-    if [[ "$SENTRY_DSN" != *".ingest.de.sentry.io/"* ]]; then
-        echo "Official EyeOh builds require a Sentry EU-region DSN." >&2
-        exit 1
-    fi
     /usr/bin/plutil -insert EyeOhSentryDSN -string "$SENTRY_DSN" "$APP_BUNDLE/Contents/Info.plist"
 fi
 
@@ -139,7 +152,7 @@ if [[ -f "$PROJECT_ROOT/Icon.icns" ]]; then
     cp "$PROJECT_ROOT/Icon.icns" "$APP_BUNDLE/Contents/Resources/Icon.icns"
 fi
 PRIVACY_MANIFEST="$PROJECT_ROOT/Config/EyeOh-PrivacyInfo-Offline.xcprivacy"
-if [[ -n "$SENTRY_DSN" || ( -n "$POSTHOG_PROJECT_TOKEN" && -n "$POSTHOG_HOST" ) ]]; then
+if [[ -n "$SENTRY_DSN" || -n "$EYEOH_STATISTICS_ENDPOINT" ]]; then
     PRIVACY_MANIFEST="$PROJECT_ROOT/Config/EyeOh-PrivacyInfo.xcprivacy"
 fi
 cp "$PRIVACY_MANIFEST" "$APP_BUNDLE/Contents/Resources/PrivacyInfo.xcprivacy"
