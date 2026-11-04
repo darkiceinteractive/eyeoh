@@ -4,6 +4,15 @@ All notable changes will be recorded here. The project follows semantic versioni
 
 ## Unreleased
 
+## 0.4.1 - 2026-08-18
+
+- Add Sparkle automatic updates to the direct-download edition, with signed update archives and an appcast published at eyeoh.app.
+- Keep the Mac App Store candidate free of updater code and update keys, with a build check that rejects any Sparkle link.
+- Add a sandboxed Mac App Store candidate build with its own entitlements and a no-collected-data privacy manifest.
+- Add release tooling for universal Developer ID builds, notarization, DMG and ZIP packaging, and release metadata checks.
+- Improve website accessibility and add responsive WebP screenshots.
+
+
 ## 0.4.0 — Bluetooth reconnect shortcuts
 
 - Remember Bluetooth audio devices that have appeared as a Mac input or output and keep them visible when disconnected.
