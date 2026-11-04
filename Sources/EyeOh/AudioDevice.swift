@@ -8,6 +8,7 @@ struct AudioDevice: Identifiable, Equatable, Sendable {
     let channelCount: UInt32
     let volume: Float32?
     let isVolumeSettable: Bool
+    let isMuted: Bool?
 
     init(
         id: AudioDeviceID,
@@ -16,7 +17,8 @@ struct AudioDevice: Identifiable, Equatable, Sendable {
         transport: AudioDeviceTransport,
         channelCount: UInt32,
         volume: Float32? = nil,
-        isVolumeSettable: Bool = false
+        isVolumeSettable: Bool = false,
+        isMuted: Bool? = nil
     ) {
         self.id = id
         self.uid = uid
@@ -25,6 +27,7 @@ struct AudioDevice: Identifiable, Equatable, Sendable {
         self.channelCount = channelCount
         self.volume = volume
         self.isVolumeSettable = isVolumeSettable
+        self.isMuted = isMuted
     }
 }
 

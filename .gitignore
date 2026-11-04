@@ -22,3 +22,9 @@ xcuserdata/
 *.p12
 *.mobileprovision
 *.provisionprofile
+
+*.dmg
+*.pkg
+*.pem
+*.cer
+.claude/worktrees/

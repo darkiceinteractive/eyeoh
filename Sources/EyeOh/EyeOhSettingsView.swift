@@ -7,6 +7,8 @@ struct EyeOhSettingsView: View {
     let preferences: AppPreferences
     let launchAtLogin: LaunchAtLoginController
     let softwareUpdater: SoftwareUpdateController
+    let hotkeyPreferences: HotkeyPreferences
+    let hotkeyCenter: HotkeyCenter
 
     var body: some View {
         TabView {
@@ -18,6 +20,12 @@ struct EyeOhSettingsView: View {
                 softwareUpdater: softwareUpdater
             )
             .tabItem { Label("General", systemImage: "gearshape") }
+
+            PrioritySettingsView(store: store)
+                .tabItem { Label("Priority", systemImage: "list.number") }
+
+            ShortcutsSettingsView(preferences: hotkeyPreferences, center: hotkeyCenter)
+                .tabItem { Label("Shortcuts", systemImage: "keyboard") }
 
             PrivacySettingsView(preferences: preferences)
                 .tabItem { Label("Privacy", systemImage: "hand.raised") }
@@ -127,7 +135,16 @@ private struct GeneralSettingsView: View {
             }
 
             Section {
+                Toggle("Keep my camera selected", isOn: Binding(get: { cameraStore.holdsSelection }, set: { cameraStore.holdsSelection = $0 }))
+            } header: {
+                Text("Camera")
+            } footer: {
+                Text("Restores your chosen camera after a restart, wake, or when an iPhone camera appears. Apps that choose their own camera, such as Zoom or Teams, still override this.")
+            }
+
+            Section {
                 Toggle("Show input volume in menu bar", isOn: $preferences.showsInputVolumeInMenu)
+                Toggle("Clear stale mute when switching input", isOn: $store.clearsStaleMuteOnSwitch)
             } header: {
                 Text("Menu controls")
             } footer: {
@@ -161,6 +178,77 @@ private struct GeneralSettingsView: View {
             }
         } message: {
             Text("This removes EyeOh's local shortcuts. It does not unpair devices from your Mac or remove their saved volume presets.")
+        }
+    }
+}
+
+private struct PrioritySettingsView: View {
+    @Bindable var store: AudioDeviceStore
+
+    var body: some View {
+        Form {
+            prioritySection(
+                title: "Input priority",
+                direction: .input,
+                locks: $store.locksInput,
+                lockTitle: "Lock input to priority list",
+                available: store.devices
+            )
+            prioritySection(
+                title: "Output priority",
+                direction: .output,
+                locks: $store.locksOutput,
+                lockTitle: "Lock output to priority list",
+                available: store.outputDevices
+            )
+        }
+        .formStyle(.grouped)
+    }
+
+    private func prioritySection(
+        title: String,
+        direction: DeviceVolumePresets.Direction,
+        locks: Binding<Bool>,
+        lockTitle: String,
+        available: [AudioDevice]
+    ) -> some View {
+        let entries = store.priority(for: direction)
+        let addable = available.filter { device in !entries.contains { $0.uid == device.uid } }
+        return Section {
+            Toggle(lockTitle, isOn: locks)
+
+            List {
+                ForEach(entries) { entry in
+                    HStack(spacing: 8) {
+                        Image(systemName: "line.3.horizontal").foregroundStyle(.tertiary)
+                        Text(entry.name)
+                        Spacer()
+                        Text(store.isConnected(entry, direction: direction) ? "Connected" : "Not connected")
+                            .font(.caption)
+                            .foregroundStyle(store.isConnected(entry, direction: direction) ? Color.green : Color.secondary)
+                        Button {
+                            store.removeFromPriority(uid: entry.uid, direction: direction)
+                        } label: {
+                            Image(systemName: "minus.circle")
+                        }
+                        .buttonStyle(.borderless)
+                        .accessibilityLabel("Remove \(entry.name)")
+                    }
+                }
+                .onMove { store.movePriority(from: $0, to: $1, direction: direction) }
+            }
+            .frame(minHeight: 70)
+
+            Menu("Add device…") {
+                ForEach(addable) { device in
+                    Button(device.name) { store.addToPriority(device, direction: direction) }
+                }
+            }
+            .disabled(addable.isEmpty)
+        } header: {
+            Text(title)
+        } footer: {
+            Text("Drag to reorder. The top connected device is used. Picking a device in the EyeOh menu while locked moves it to the top. If something keeps changing the device, EyeOh pauses the lock for a minute.")
         }
     }
 }
