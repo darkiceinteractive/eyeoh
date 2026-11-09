@@ -46,12 +46,16 @@ if [[ -n "${ARCHES:-}" ]]; then
 else
     ARCH_LIST=("$(uname -m)")
 fi
+BUILD_ARGS=(--scratch-path "$SWIFT_SCRATCH_PATH" -c "$CONFIGURATION")
 for ARCH in "${ARCH_LIST[@]}"; do
-    EYEOH_DISTRIBUTION_CHANNEL="$DISTRIBUTION_CHANNEL" \
-        swift build \
-            --scratch-path "$SWIFT_SCRATCH_PATH" \
-            -c "$CONFIGURATION" \
-            --arch "$ARCH"
+    BUILD_ARGS+=(--arch "$ARCH")
+done
+export EYEOH_DISTRIBUTION_CHANNEL="$DISTRIBUTION_CHANNEL"
+swift build "${BUILD_ARGS[@]}"
+PRODUCT_DIR=$(swift build "${BUILD_ARGS[@]}" --show-bin-path)
+BINARY_SOURCE="$PRODUCT_DIR/$APP_NAME"
+for ARCH in "${ARCH_LIST[@]}"; do
+    lipo "$BINARY_SOURCE" -verify_arch "$ARCH"
 done
 
 APP_BUNDLE="$APP_BUILD_ROOT/$APP_NAME.app"
@@ -60,16 +64,7 @@ BINARY_DESTINATION="$APP_BUNDLE/Contents/MacOS/$APP_NAME"
 rm -rf "$APP_BUNDLE"
 mkdir -p "$APP_BUNDLE/Contents/MacOS" "$APP_BUNDLE/Contents/Resources"
 
-BINARY_SOURCES=()
-for ARCH in "${ARCH_LIST[@]}"; do
-    BINARY_SOURCES+=("$SWIFT_SCRATCH_PATH/$ARCH-apple-macosx/$CONFIGURATION/$APP_NAME")
-done
-
-if [[ ${#BINARY_SOURCES[@]} -gt 1 ]]; then
-    lipo -create "${BINARY_SOURCES[@]}" -output "$BINARY_DESTINATION"
-else
-    cp "${BINARY_SOURCES[0]}" "$BINARY_DESTINATION"
-fi
+cp "$BINARY_SOURCE" "$BINARY_DESTINATION"
 chmod +x "$BINARY_DESTINATION"
 
 if [[ "$DISTRIBUTION_CHANNEL" == "direct" ]]; then

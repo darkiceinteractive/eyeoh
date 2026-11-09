@@ -15,7 +15,7 @@ fi
 
 mkdir -p "$PUBLIC_ASSETS"
 CARD_SVG="$(mktemp "${TMPDIR:-/tmp}/eyeoh-card.XXXXXX")"
-MENU_B64="$(base64 < "$PUBLIC_ASSETS/eyeoh-menu-main.png" | tr -d "\n")"
+MENU_B64="$(base64 < "$PUBLIC_ASSETS/eyeoh-demo-menu.png" | tr -d "\n")"
 sed "s|@@MENU_PNG@@|$MENU_B64|" "$SITE_ASSETS/social-card.svg" > "$CARD_SVG"
 rsvg-convert -w 1200 -h 630 "$CARD_SVG" -o "$PUBLIC_ASSETS/eyeoh-social-card.png"
 rm -f "$CARD_SVG"
