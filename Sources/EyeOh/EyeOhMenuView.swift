@@ -2,15 +2,20 @@ import AppKit
 import SwiftUI
 
 struct EyeOhMenuView: View {
-    @Environment(\.colorScheme) private var colorScheme
     @Environment(\.openSettings) private var openSettings
     @Environment(\.openWindow) private var openWindow
+    @State private var appearance = NSApplication.shared.effectiveAppearance
 
     let store: AudioDeviceStore
     let cameraStore: CameraDeviceStore
     let preferences: AppPreferences
     let softwareUpdater: SoftwareUpdateController
     let micMute: MicMuteController
+
+    private var selectedDeviceColor: Color {
+        appearance.bestMatch(from: [.aqua, .darkAqua]) == .darkAqua
+            ? DarkIceBrand.lime : DarkIceBrand.readableBlue
+    }
 
     var body: some View {
         Group {
@@ -111,6 +116,8 @@ struct EyeOhMenuView: View {
             }
             .keyboardShortcut("q")
         }
+        // Native menu labels can receive a light SwiftUI colour scheme in Dark Mode.
+        .onReceive(NSApplication.shared.publisher(for: \.effectiveAppearance)) { appearance = $0 }
         .onAppear {
             // Volume may have changed in Sound Settings while the menu was closed.
             store.refresh()
@@ -268,11 +275,7 @@ struct EyeOhMenuView: View {
         Label {
             Text(compactMenuName(device.name))
                 .fontWeight(selected ? .semibold : .regular)
-                .foregroundStyle(
-                    selected
-                        ? (colorScheme == .dark ? DarkIceBrand.iceBlue : DarkIceBrand.readableBlue)
-                        : .primary
-                )
+                .foregroundStyle(selected ? selectedDeviceColor : .primary)
         } icon: {
             if selected {
                 Image(systemName: "checkmark.circle.fill")
@@ -301,11 +304,7 @@ struct EyeOhMenuView: View {
         Label {
             Text(compactMenuName(camera.name))
                 .fontWeight(selected ? .semibold : .regular)
-                .foregroundStyle(
-                    selected
-                        ? (colorScheme == .dark ? DarkIceBrand.iceBlue : DarkIceBrand.readableBlue)
-                        : .primary
-                )
+                .foregroundStyle(selected ? selectedDeviceColor : .primary)
         } icon: {
             if selected {
                 Image(systemName: "checkmark.circle.fill")
