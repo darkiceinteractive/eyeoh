@@ -56,6 +56,8 @@ The public website lives in `Website/`. Its primary DMG and fallback ZIP downloa
 
 Direct-download builds include Sparkle and produce signed appcast material only after notarization. Mac App Store and source builds compile the updater out entirely. The first updater-enabled release remains a one-time manual upgrade from 0.4.0 because the published 0.4.0 app has no updater.
 
+To try EyeOh without changing your Mac’s routes, build the demo with `bash Scripts/build_demo.sh` and open `build/demo/EyeOh.app`. The demo window and menu bar icon share the same sample devices, including simulated Bluetooth reconnect. For an unplugged preferred camera, quit the demo and run `open -n build/demo/EyeOh.app --args --camera-disconnected`. The demo uses its own settings and does not open a live camera feed.
+
 ## Privacy and diagnostics
 
 Usage statistics and crash reporting are separate and off by default. Official release builds can inject reporting configuration at packaging time; source builds without those values remain offline. The public EyeOh 0.4.0 build was released without a PostHog token/host or Sentry DSN, so both controls are unavailable and it sends no EyeOh analytics or crash reports. A future configured build may use only the six fixed product events and restricted crash/hang boundary documented in `TELEMETRY.md`; neither path may include device names, recordings, screenshots, contact details or free text.

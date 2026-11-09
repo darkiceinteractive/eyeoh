@@ -3,6 +3,7 @@ import PackageDescription
 
 let distributionChannel = Context.environment["EYEOH_DISTRIBUTION_CHANNEL"] ?? "source"
 let includesDirectUpdater = distributionChannel == "direct"
+let buildsDemo = distributionChannel == "source" && Context.environment["EYEOH_BUILD_DEMO"] == "1"
 
 var packageDependencies: [Package.Dependency] = []
 var eyeOhDependencies: [Target.Dependency] = ["Sentry"]
@@ -39,6 +40,7 @@ let package = Package(
             name: "EyeOh",
             dependencies: eyeOhDependencies,
             path: "Sources/EyeOh",
+            exclude: buildsDemo ? ["EyeOhApp.swift"] : ["EyeOhDemoApp.swift"],
             swiftSettings: eyeOhSwiftSettings,
             linkerSettings: eyeOhLinkerSettings
         ),

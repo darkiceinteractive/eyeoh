@@ -7,6 +7,8 @@ All notable changes will be recorded here. The project follows semantic versioni
 ## 0.5.1 - 2026-11-09
 
 - Match selected device names to their lime checks in dark mode and show them in blue in light mode.
+- Refresh the website with a clearer download, illustrated device scenarios, installation steps, and support links.
+- Add a separate demo build with sample devices for testing Bluetooth reconnect and an unplugged preferred camera.
 
 ## 0.5.0 - 2026-10-30
 

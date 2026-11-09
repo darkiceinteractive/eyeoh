@@ -6,6 +6,19 @@
         <description>Signed direct-download updates for EyeOh.</description>
         <language>en-au</language>
         <item>
+            <title>0.5.1</title>
+            <pubDate>Mon, 09 Nov 2026 11:13:09 +1000</pubDate>
+            <link>https://eyeoh.app/</link>
+            <sparkle:version>9</sparkle:version>
+            <sparkle:shortVersionString>0.5.1</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
+            <enclosure url="https://eyeoh.app/updates/EyeOh-0.5.1-9.zip" length="3781742" type="application/octet-stream" sparkle:edSignature="/dcLb5pv7gpC0QgRPQ8LA6errcU1mle/D7Y/EdfVHhTRF6dJYAiGhqGJYSBko6lqk4PR0gMhzJ62fmzLCVaeDw=="/>
+            <sparkle:deltas>
+                <enclosure url="https://eyeoh.app/updates/EyeOh9-8.delta" sparkle:deltaFrom="8" length="13046" type="application/octet-stream" sparkle:deltaFromSparkleExecutableSize="977808" sparkle:deltaFromSparkleLocales="de,he,ar,el,ja,fa,uk" sparkle:edSignature="XmPEUyfhAds6qNr3bdnLwwZCaCpQWnaF89+Q4RJE2meV1SYkqIyqyNhbvbw6ZF9k8SaYA9hd2+9SRYJ/4frHBQ=="/>
+                <enclosure url="https://eyeoh.app/updates/EyeOh9-7.delta" sparkle:deltaFrom="7" length="14690" type="application/octet-stream" sparkle:deltaFromSparkleExecutableSize="977808" sparkle:deltaFromSparkleLocales="de,he,ar,el,ja,fa,uk" sparkle:edSignature="JB8jt3+AQpqLqgsvWZIldvRX1s7Cv92i3Pmb37D2vnEz6hwHa6IzRnQ8hTCPUb2nH37gZKceph3AIgq/4MoUDQ=="/>
+            </sparkle:deltas>
+        </item>
+        <item>
             <title>0.5.0</title>
             <pubDate>Sun, 01 Nov 2026 10:36:31 +1000</pubDate>
             <link>https://eyeoh.app/</link>
